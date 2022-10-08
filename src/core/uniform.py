@@ -33,5 +33,7 @@ class Uniform(object):
             glUniform3f(self._VariableRef, *self._Data)
         elif self._DataType == "vec4":
             glUniform4f(self._VariableRef, *self._Data)
+        elif self._DataType == "mat4":
+            glUniformMatrix4fv(self._VariableRef, 1, GL_TRUE, self._Data)
         else:
             raise Exception(f"Unregonized uniform type: {self._DataType}")
