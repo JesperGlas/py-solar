@@ -1,10 +1,12 @@
+from OpenGL.GL import *
 from core.object3D import Object3D
 from core.attribute import Attribute
-from OpenGL.GL import *
+from material.material import Material
+from geometry.geometry import Geometry
 
 class Mesh(Object3D):
 
-    def __init__(self, geometry, material) -> None:
+    def __init__(self, geometry: Geometry, material: Material) -> None:
         super().__init__()
 
         self._Geometry = geometry
