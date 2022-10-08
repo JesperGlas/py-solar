@@ -41,6 +41,9 @@ class App(Base):
         """
 
         self._ProgramRef = util.initializeProgram(vs, fs)
+
+        glClearColor(0.0, 0.0, 0.0, 1.0)
+        
         vao_ref = glGenVertexArrays(1)
         glBindVertexArray(vao_ref)
 
@@ -53,27 +56,23 @@ class App(Base):
         a_position = Attribute("vec3", position_data)
         a_position.associateVariable("a_position", self._ProgramRef)
 
-        self._Trans1 = Uniform("vec3", [-0.5, 0.0, 0.0])
-        self._Trans1.locateVariable("u_translation", self._ProgramRef)
+        self._Trans = Uniform("vec3", [-0.5, 0.0, 0.0])
+        self._Trans.locateVariable("u_translation", self._ProgramRef)
 
-        self._Trans2 = Uniform("vec3", [0.5, 0.0, 0.0])
-        self._Trans2.locateVariable("u_translation", self._ProgramRef)
-
-        self._Color1 = Uniform("vec3", [1.0, 0.0, 0.0])
-        self._Color1.locateVariable("u_color", self._ProgramRef)
-
-        self._Color2 = Uniform("vec3", [0.0, 0.0, 1.0])
-        self._Color2.locateVariable("u_color", self._ProgramRef)
+        self._Color = Uniform("vec3", [1.0, 0.0, 0.0])
+        self._Color.locateVariable("u_color", self._ProgramRef)
 
     def update(self) -> None:
+
+        self._Trans._Data[0] += 0.01
+        if self._Trans._Data[0] > 1.2:
+            self._Trans._Data[0] = -1.2
+
+        glClear(GL_COLOR_BUFFER_BIT)
+
         glUseProgram(self._ProgramRef)
-
-        self._Trans1.uploadData()
-        self._Color1.uploadData()
-        glDrawArrays(GL_TRIANGLES, 0, self._VertexCount)
-
-        self._Trans2.uploadData()
-        self._Color2.uploadData()
+        self._Trans.uploadData()
+        self._Color.uploadData()
         glDrawArrays(GL_TRIANGLES, 0, self._VertexCount)
     
 if __name__ == '__main__':
