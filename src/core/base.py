@@ -4,7 +4,7 @@ from core.input import Input
 
 class Base(object):
     
-    def __init__(self, screen_size=[512, 512], caption="Main Window"):
+    def __init__(self, screen_size=[512, 512], caption="Main Window", fps=60):
         
         pg.init()
 

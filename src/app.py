@@ -5,7 +5,7 @@ from core.scene import Scene
 from core.camera import Camera
 from core.mesh import Mesh
 from geometry.sphere_geometry import SphereGeometry
-from material.point_material import PointMaterial
+from material.line_material import LineMaterial
 
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
@@ -27,7 +27,7 @@ class App(Base):
         self._Camera.setPosition([0, 0, 4])
 
         geometry = SphereGeometry()
-        material = PointMaterial()
+        material = LineMaterial()
         self._Mesh = Mesh(geometry, material)
         self._Scene.add(self._Mesh)
 
