@@ -14,7 +14,7 @@ class Attribute(object):
         glBindBuffer(GL_ARRAY_BUFFER, self._BufferRef)
         glBufferData(GL_ARRAY_BUFFER, data.ravel(), GL_STATIC_DRAW)
 
-    def associateVariable(self, program_reference, variable_name) -> None:
+    def associateVariable(self, variable_name, program_reference) -> None:
         variable_ref = glGetAttribLocation(program_reference, variable_name)
 
         if variable_ref != -1:

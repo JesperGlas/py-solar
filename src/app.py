@@ -20,24 +20,29 @@ class App(Base):
         
         vs = """
         in vec3 a_position;
+        in vec3 a_color;
+        out vec3 v_color;
 
         void main()
         {
             gl_Position = vec4(a_position, 1.0);
+            v_color = a_color;
         }
         """
 
         fs = """
+        in vec3 v_color;
         out vec4 fragColor;
 
         void main()
         {
-            fragColor = vec4(1.0, 0.2, 0.5, 1.0);
+            fragColor = vec4(v_color, 1.0);
         }
         """
 
         self._ProgramRef = util.initializeProgram(vs, fs)
         glLineWidth(4)
+        glPointSize(10)
 
         vao_ref = glGenVertexArrays(1)
         glBindVertexArray(vao_ref)
@@ -50,11 +55,20 @@ class App(Base):
 
         self._VertexCount = len(position_data)
         position_attribute = Attribute("vec3", position_data)
-        position_attribute.associateVariable(self._ProgramRef, "a_position")
+        position_attribute.associateVariable("a_position", self._ProgramRef)
+
+        color_data = [
+            [1.0, 0.0, 0.0], [1.0, 0.5, 0.0],
+            [1.0, 1.0, 1.0], [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0], [0.5, 0.0, 1.0]
+        ]
+
+        color_attribute = Attribute("vec3", color_data)
+        color_attribute.associateVariable("a_color", self._ProgramRef)
 
     def update(self) -> None:
         glUseProgram(self._ProgramRef)
-        glDrawArrays(GL_LINE_LOOP, 0, self._VertexCount)
+        glDrawArrays(GL_POINTS, 0, self._VertexCount)
     
 if __name__ == '__main__':
     App().run()
