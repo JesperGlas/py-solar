@@ -5,7 +5,7 @@ class OpenGLUtils(object):
     @staticmethod
     def initializeShader(shader_code, shader_type):
         
-        shader_code = f"#version 330\n{shader_code}"
+        shader_code = '#version 330\n' + shader_code
         shader_ref = glCreateShader(shader_type)
         glShaderSource(shader_ref, shader_code)
         glCompileShader(shader_ref)

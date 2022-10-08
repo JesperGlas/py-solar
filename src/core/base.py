@@ -4,43 +4,53 @@ from core.input import Input
 
 class Base(object):
     
-    def __init__(self, screen_size=[512, 512]):
+    def __init__(self, screen_size=[512, 512], caption="Main Window"):
         
         pg.init()
+
         display_flags = pg.DOUBLEBUF | pg.OPENGL
-        
         pg.display.gl_set_attribute(pg.GL_MULTISAMPLEBUFFERS, 1)
         pg.display.gl_set_attribute(pg.GL_MULTISAMPLESAMPLES, 4)
         pg.display.gl_set_attribute(
             pg.GL_CONTEXT_PROFILE_MASK,
             pg.GL_CONTEXT_PROFILE_CORE
         )
-        self.screen = pg.display.set_mode(screen_size, display_flags)
-        pg.display.set_caption("Solar System Simulation")
+        self._Screen = pg.display.set_mode(screen_size, display_flags)
+        pg.display.set_caption(caption)
         
-        self.running = True
-        self.clock = pg.time.Clock()
+        self._Running = True
+        self._Clock = pg.time.Clock()
         
         # for user input
-        self.input = Input()
+        self._Input = Input()
         
-    def initilize(self) -> None:
+    def initialize(self) -> None:
+        print("Initializing..")
+        # specify in inherited class
         pass
     
     def update(self) -> None:
-        self.input.update()
+        # specify in inherited class
+        pass
+
+    def shutdown(self) -> None:
+        print("Shutting down..")
+        pg.quit()
+        sys.exit()
     
     def run(self) -> None:
+        print("Running..")
         
         # startup
-        self.initilize()
+        self.initialize()
         
         # main loop
-        while self.running:
+        while self._Running:
             
             # handle input
-            if self.input.quit:
-                self.running = False
+            self._Input.update()
+            if self._Input._Quit:
+                self._Running = False
             
             # update
             self.update()
@@ -49,8 +59,7 @@ class Base(object):
             pg.display.flip()
             
             # sync clock
-            self.clock.tick(60)
+            self._Clock.tick(60)
             
         # shutdown
-        pg.quit()
-        sys.exit()
+        self.shutdown()
