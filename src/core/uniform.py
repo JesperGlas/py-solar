@@ -25,7 +25,7 @@ class Uniform(object):
             glUniform1i(self._VariableRef, self._Data)
         elif self._DataType == "bool":
             glUniform1i(self._VariableRef, self._Data)
-        elif self._Data == "float":
+        elif self._DataType == "float":
             glUniform1f(self._VariableRef, self._Data)
         elif self._DataType == "vec2":
             glUniform2f(self._VariableRef, *self._Data)
@@ -36,4 +36,4 @@ class Uniform(object):
         elif self._DataType == "mat4":
             glUniformMatrix4fv(self._VariableRef, 1, GL_TRUE, self._Data)
         else:
-            raise Exception(f"Unregonized uniform type: {self._DataType}")
+            raise Exception(f"Unrecognized uniform type: {self._DataType}")
