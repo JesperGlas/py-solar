@@ -67,8 +67,7 @@ class App(Base):
 
     def update(self) -> None:
 
-        self._Trans._Data[0] = 0.75 * cos(self._ElapsedTime)
-        self._Trans._Data[1] = 0.75 * sin(self._ElapsedTime)
+        self._Color._Data[0] = (sin(3 * (self._ElapsedTime)) + 1) / 2
 
         glClear(GL_COLOR_BUFFER_BIT)
 
