@@ -4,7 +4,7 @@ from core.renderer import Renderer
 from core.scene import Scene
 from core.camera import Camera
 from core.mesh import Mesh
-from geometry.sphere_geometry import SphereGeometry
+from geometry.box_geometry import BoxGeometry
 from material.point_material import PointMaterial
 
 TITLE: str = "Solarpy"
@@ -26,7 +26,7 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=1280/720)
         self._Camera.setPosition([0, 0, 4])
 
-        geometry = SphereGeometry()
+        geometry = BoxGeometry()
         material = PointMaterial()
         self._Mesh = Mesh(geometry, material)
         self._Scene.add(self._Mesh)

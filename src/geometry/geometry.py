@@ -6,7 +6,6 @@ class Geometry(object):
     def __init__(self) -> None:
         
         self._Attributes: Dict[str, Attribute] = {}
-
         self._VertexCount: int = None
 
     def addAttribute(self, data_type: str, variable_name: str, data) -> None:
