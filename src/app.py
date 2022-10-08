@@ -1,8 +1,11 @@
+from re import S
 from OpenGL.GL import *
 from core.base import Base
 from core.utils import OpenGLUtils as util
 from core.attribute import Attribute
 from core.uniform import Uniform
+
+from math import sin, cos
 
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
@@ -64,9 +67,8 @@ class App(Base):
 
     def update(self) -> None:
 
-        self._Trans._Data[0] += 0.01
-        if self._Trans._Data[0] > 1.2:
-            self._Trans._Data[0] = -1.2
+        self._Trans._Data[0] = 0.75 * cos(self._ElapsedTime)
+        self._Trans._Data[1] = 0.75 * sin(self._ElapsedTime)
 
         glClear(GL_COLOR_BUFFER_BIT)
 

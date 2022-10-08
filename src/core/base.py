@@ -23,6 +23,9 @@ class Base(object):
         
         # for user input
         self._Input = Input()
+
+        # runtime
+        self._ElapsedTime = 0
         
     def initialize(self) -> None:
         print("Initializing..")
@@ -52,6 +55,10 @@ class Base(object):
             if self._Input._Quit:
                 self._Running = False
             
+            # update time
+            self._DeltaTime = self._Clock.get_time() / 1000
+            self._ElapsedTime += self._DeltaTime
+
             # update
             self.update()
             
