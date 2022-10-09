@@ -5,6 +5,9 @@ from core.scene import Scene
 from core.camera import Camera
 from core.uniform import Uniform
 
+import pygame as pg
+from core.render_target import RenderTarget
+
 class Renderer(object):
 
     def __init__(self, clear_color = [0, 0, 0]) -> None:
@@ -21,7 +24,20 @@ class Renderer(object):
         glEnable( GL_BLEND )
         glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 
-    def render(self, scene: Scene, camera: Camera) -> None:
+        # render taget modifications
+        self._WindowSize = pg.display.get_surface().get_size()
+
+    def render(self, scene: Scene, camera: Camera, render_target: RenderTarget=None) -> None:
+
+        # active render target
+        if render_target == None:
+            # set render target to window
+            glBindFramebuffer(GL_FRAMEBUFFER, 0)
+            glViewport(0, 0, self._WindowSize[0], self._WindowSize[1])
+        else:
+            # set render target properties
+            glBindFramebuffer(GL_FRAMEBUFFER, render_target._FramebufferRef)
+            glViewport(0, 0, render_target._Width, render_target._Height)
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 

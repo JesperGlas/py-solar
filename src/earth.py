@@ -43,20 +43,21 @@ class App(Base):
         # setup moving camera position
         self._Rig = MovementRig()
         self._Rig.add(self._Camera)
-        self._Rig.setPosition([0.5, 1, 5])
+        self._Rig.setPosition([0, 0, 5])
         self._Scene.add(self._Rig)
 
         geo = SphereGeometry()
         source_path = Path(__file__).resolve().parent
         print(f"Loading assets from: {source_path}/assets")
         crate = Texture(f"{source_path}/assets/earth.jpg")
-        mat = TextureMaterial(crate)
-        mesh = Mesh(geo, mat)
-        self._Scene.add(mesh)
+        earth_mat = TextureMaterial(crate)
+        self._EarthMesh = Mesh(geo, earth_mat)
+        self._Scene.add(self._EarthMesh)
 
     def update(self) -> None:
         # update data
         self._Rig.update(self._Input, self._DeltaTime)
+        self._EarthMesh.rotateX(-0.002)
         
         # update uniforms
 
