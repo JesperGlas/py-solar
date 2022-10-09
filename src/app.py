@@ -11,6 +11,9 @@ from core.scene import Scene
 from core.camera import Camera
 from core.mesh import Mesh
 from geometry.box_geometry import BoxGeometry
+from geometry.sphere_geometry import SphereGeometry
+
+from material.surface_material import SurfaceMaterial
 
 # texture
 from core.texture import Texture
@@ -43,12 +46,12 @@ class App(Base):
         self._Rig.setPosition([0.5, 1, 5])
         self._Scene.add(self._Rig)
 
-        geo = BoxGeometry()
+        geo = SphereGeometry()
         source_path = Path(__file__).resolve().parent
         print(f"Loading assets from: {source_path}/assets")
         crate = Texture(f"{source_path}/assets/crate.jpg")
         mat = TextureMaterial(crate)
-        mesh = Mesh(geo, mat)
+        mesh = Mesh(geo, SurfaceMaterial())
         self._Scene.add(mesh)
 
     def update(self) -> None:
