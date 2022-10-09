@@ -13,8 +13,7 @@ class Base(object):
         pg.display.gl_set_attribute(pg.GL_MULTISAMPLESAMPLES, 4)
         pg.display.gl_set_attribute(
             pg.GL_CONTEXT_PROFILE_MASK,
-            pg.GL_CONTEXT_PROFILE_CORE
-        )
+            pg.GL_CONTEXT_PROFILE_CORE )
         self._Screen = pg.display.set_mode(screen_size, display_flags)
         pg.display.set_caption(caption)
         

@@ -1,4 +1,5 @@
 from math import pi
+from pathlib import Path
 
 # core
 from core.utils import OpenGLUtils
@@ -44,7 +45,9 @@ class App(Base):
         self._Scene.add(self._Rig)
 
         geo = RectangleGeometry()
-        crate = Texture("src\assets\crate.jpg")
+        source_path = Path(__file__).resolve().parent
+        print(f"Loading assets from: {source_path}/assets")
+        crate = Texture(f"{source_path}/assets/crate.jpg")
         mat = TextureMaterial(crate)
         mesh = Mesh(geo, mat)
         self._Scene.add(mesh)
