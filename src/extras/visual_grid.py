@@ -4,10 +4,7 @@ from material.line_material import LineMaterial
 
 class VisualGrid(Mesh):
 
-    def __init__(
-        self,
-        size=10,
-        divisions=10,
+    def __init__(self, size=10, divisions=10,
         grid_color=[0, 0, 0],
         center_color=[0.5, 0.5, 0.5],
         line_width=1
@@ -27,17 +24,17 @@ class VisualGrid(Mesh):
         # add vertical lines
         for x in values:
             position_data.append( [x, -size/2, 0] )
-            position_data.append( [x, size/2, 0] )
+            position_data.append( [x,  size/2, 0] )
             if x == 0:
                 color_data.append(center_color)
                 color_data.append(center_color)
             else:
                 color_data.append(grid_color)
                 color_data.append(grid_color)
-
+        # for horizontal lines
         for y in values:
             position_data.append( [-size/2, y, 0] )
-            position_data.append( [size/2, y, 0] )
+            position_data.append( [ size/2, y, 0] )
             if y == 0:
                 color_data.append(center_color)
                 color_data.append(center_color)
@@ -52,9 +49,9 @@ class VisualGrid(Mesh):
 
         # material
         material = LineMaterial({
-            "u_useVertexColors":  True,
-            "lineWidth":        line_width,
-            "lineType":         "segments"
+            "u_useVertexColors":    True,
+            "lineWidth":            line_width,
+            "lineType":             "segments"
         })
         
         super().__init__(geometry, material)

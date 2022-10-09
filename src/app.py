@@ -9,12 +9,13 @@ from core.renderer import Renderer
 from core.scene import Scene
 from core.camera import Camera
 from core.mesh import Mesh
-from material.material import Material
-from geometry.sphere_geometry import SphereGeometry
+from material.surface_material import SurfaceMaterial
+from geometry.box_geometry import BoxGeometry
 
 # extra
 from extras.visual_axes import VisualAxes
 from extras.visual_grid import VisualGrid
+from extras.movement_rig import MovementRig
 
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
@@ -35,9 +36,10 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=1280/720)
         
         # set camera position
-        self._Camera.setPosition([0.5, 1, 5])
-
-        # extras
+        self._Rig = MovementRig()
+        self._Rig.add(self._Camera)
+        self._Rig.setPosition([0.5, 1, 5])
+        self._Scene.add(self._Rig)
 
         axes = VisualAxes(axis_length=2)
         self._Scene.add(axes)
@@ -47,10 +49,13 @@ class App(Base):
             grid_color=[1, 1, 1],
             center_color=[1, 1, 0],
         )
-        grid.rotateX(-pi/2)
+        grid.rotateZ(pi/2)
         self._Scene.add(grid)
 
     def update(self) -> None:
+        # update data
+        self._Rig.update(self._Input, self._DeltaTime)
+        
         # update uniforms
 
         # render
