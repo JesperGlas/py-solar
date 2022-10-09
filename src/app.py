@@ -10,8 +10,7 @@ from core.renderer import Renderer
 from core.scene import Scene
 from core.camera import Camera
 from core.mesh import Mesh
-from material.surface_material import SurfaceMaterial
-from geometry.rectangle_geometry import RectangleGeometry
+from geometry.box_geometry import BoxGeometry
 
 # texture
 from core.texture import Texture
@@ -44,7 +43,7 @@ class App(Base):
         self._Rig.setPosition([0.5, 1, 5])
         self._Scene.add(self._Rig)
 
-        geo = RectangleGeometry()
+        geo = BoxGeometry()
         source_path = Path(__file__).resolve().parent
         print(f"Loading assets from: {source_path}/assets")
         crate = Texture(f"{source_path}/assets/crate.jpg")

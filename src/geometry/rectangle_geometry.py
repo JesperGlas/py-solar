@@ -26,5 +26,5 @@ class RectangleGeometry(Geometry):
 
         # texture coordinates
         t0, t1, t2, t3 = [0, 0], [1, 0], [0, 1], [1, 1]
-        tex_data = [t0, t1, t3, t0, t3, t2]
-        self.addAttribute("vec2", "a_texCoords", tex_data)
+        texture_data = [t0, t1, t3, t0, t3, t2]
+        self.addAttribute("vec2", "a_texCoords", texture_data)
