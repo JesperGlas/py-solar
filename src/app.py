@@ -12,6 +12,10 @@ from core.mesh import Mesh
 from material.surface_material import SurfaceMaterial
 from geometry.rectangle_geometry import RectangleGeometry
 
+# texture
+from core.texture import Texture
+from material.texture_material import TextureMaterial
+
 # extra
 from extras.movement_rig import MovementRig
 
@@ -40,7 +44,8 @@ class App(Base):
         self._Scene.add(self._Rig)
 
         geo = RectangleGeometry()
-        mat = SurfaceMaterial()
+        crate = Texture("src\assets\crate.jpg")
+        mat = TextureMaterial(crate)
         mesh = Mesh(geo, mat)
         self._Scene.add(mesh)
 

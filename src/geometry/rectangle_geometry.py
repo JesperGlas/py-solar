@@ -23,3 +23,8 @@ class RectangleGeometry(Geometry):
         self.addAttribute("vec3", "a_position", position_data)
         self.addAttribute("vec3", "a_color", color_data)
         self.countVertecies()
+
+        # texture coordinates
+        t0, t1, t2, t3 = [0, 0], [1, 0], [0, 1], [1, 1]
+        tex_data = [t0, t1, t3, t0, t3, t2]
+        self.addAttribute("vec2", "a_texCoords", tex_data)

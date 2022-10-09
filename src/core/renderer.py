@@ -15,8 +15,11 @@ class Renderer(object):
             clear_color[0],
             clear_color[1],
             clear_color[2],
-            1
-        )
+            1 )
+        
+        # for textures
+        glEnable( GL_BLEND )
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 
     def render(self, scene: Scene, camera: Camera) -> None:
 
