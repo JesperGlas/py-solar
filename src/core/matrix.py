@@ -1,5 +1,7 @@
 import numpy as np
+import numpy.linalg as nplin
 from math import sin, cos, tan, pi
+
 
 class Matrix(object):
 
@@ -76,3 +78,30 @@ class Matrix(object):
             [0, 0, b, c],
             [0, 0, -1, 0]
         ]).astype(float)
+
+    @staticmethod
+    def makeLookAt(position, target):
+        world_up = [0, 1, 0]
+        forward = np.subtract(target, position)
+        right = np.cross(forward, world_up)
+
+        # if forward and world_up is parallel
+        # right vector is 0;
+        #   fix by perturbing world_up vector a bit
+        if nplin.norm(right) < 0.001:
+            offset = np.array( [0.001, 0, 0] )
+            right = np.cross(forward, world_up+offset)
+
+        up = np.cross(right, forward)
+
+        # all vectors should have length 1
+        forward = np.divide(forward, nplin.norm(forward))
+        right = np.divide(right, nplin.norm(right))
+        up = np.divide(up, nplin.norm(up))
+
+        return np.array([
+            [right[0], up[0], -forward[0], position[0]],
+            [right[1], up[1], -forward[1], position[1]],
+            [right[2], up[2], -forward[2], position[2]],
+            [0, 0, 0, 1]
+        ]).astype(float) # should astype be there?

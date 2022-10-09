@@ -14,7 +14,6 @@ from geometry.box_geometry import BoxGeometry
 from geometry.sphere_geometry import SphereGeometry
 
 from material.surface_material import SurfaceMaterial
-from material.material import Material
 
 # texture
 from core.texture import Texture
@@ -42,23 +41,22 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=1280/720)
         
         # setup moving camera position
-        self._CameraRig = MovementRig()
-        self._CameraRig.add(self._Camera)
-        self._CameraRig.setPosition([0, 0, 5])
-        self._Scene.add(self._CameraRig)
+        self._Rig = MovementRig()
+        self._Rig.add(self._Camera)
+        self._Rig.setPosition([0.5, 1, 5])
+        self._Scene.add(self._Rig)
 
         geo = SphereGeometry()
         source_path = Path(__file__).resolve().parent
         print(f"Loading assets from: {source_path}/assets")
         crate = Texture(f"{source_path}/assets/earth.jpg")
         mat = TextureMaterial(crate)
-        self._Mesh = Mesh(geo, mat)
-        self._Scene.add(self._Mesh)
+        mesh = Mesh(geo, mat)
+        self._Scene.add(mesh)
 
     def update(self) -> None:
         # update data
-        self._CameraRig.update(self._Input, self._DeltaTime)
-        self._Mesh.rotateX(0.003)
+        self._Rig.update(self._Input, self._DeltaTime)
         
         # update uniforms
 
