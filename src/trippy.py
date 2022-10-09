@@ -6,6 +6,7 @@ from core.camera import Camera
 from core.mesh import Mesh
 from material.material import Material
 from geometry.sphere_geometry import SphereGeometry
+from extras.movement_rig import MovementRig
 
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
@@ -26,7 +27,9 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=1280/720)
         
         # set camera position
-        self._Camera.setPosition([0, 0, 7])
+        self._Rig = MovementRig()
+        self._Rig.add(self._Camera)
+        self._Rig.setPosition([0, 0, 7])
 
         vs_code: str = """
         uniform mat4 u_model;
@@ -74,6 +77,7 @@ class App(Base):
         # update uniforms
         self._ElapsedTime += 1/60
         self._Mesh._Material._Uniforms["u_time"]._Data = self._ElapsedTime
+        self._Rig.update(self._Input, self._DeltaTime)
 
         # render
         self._Renderer.render(self._Scene, self._Camera)
