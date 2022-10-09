@@ -10,11 +10,9 @@ from core.scene import Scene
 from core.camera import Camera
 from core.mesh import Mesh
 from material.surface_material import SurfaceMaterial
-from geometry.box_geometry import BoxGeometry
+from geometry.rectangle_geometry import RectangleGeometry
 
 # extra
-from extras.visual_axes import VisualAxes
-from extras.visual_grid import VisualGrid
 from extras.movement_rig import MovementRig
 
 TITLE: str = "Solarpy"
@@ -35,22 +33,16 @@ class App(Base):
         self._Scene = Scene()
         self._Camera = Camera(aspect_ratio=1280/720)
         
-        # set camera position
+        # setup moving camera position
         self._Rig = MovementRig()
         self._Rig.add(self._Camera)
         self._Rig.setPosition([0.5, 1, 5])
         self._Scene.add(self._Rig)
 
-        axes = VisualAxes(axis_length=2)
-        self._Scene.add(axes)
-
-        grid = VisualGrid(
-            size=20,
-            grid_color=[1, 1, 1],
-            center_color=[1, 1, 0],
-        )
-        grid.rotateZ(pi/2)
-        self._Scene.add(grid)
+        geo = RectangleGeometry()
+        mat = SurfaceMaterial()
+        mesh = Mesh(geo, mat)
+        self._Scene.add(mesh)
 
     def update(self) -> None:
         # update data
