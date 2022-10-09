@@ -11,7 +11,20 @@ class Uniform(object):
         self._VariableRef = None
 
     def locateVariable(self, variable_name, program_ref) -> None:
-        self._VariableRef = glGetUniformLocation(program_ref, variable_name)
+        if self._DataType == "Light":
+            self._VariableRef = {}
+            self._VariableRef["lightType"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.lightType" )
+            self._VariableRef["color"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.color" )
+            self._VariableRef["direction"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.direction" )
+            self._VariableRef["position"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.position" )
+            self._VariableRef["attenuation"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.attenuation" )
+        else:
+            self._VariableRef = glGetUniformLocation(program_ref, variable_name)
 
     # should this be intended?
     def uploadData(self) -> None:
@@ -45,5 +58,13 @@ class Uniform(object):
             # upload texture unit number (0, ..., 15) to
             #   uniform variable in shader
             glUniform1i( self._VariableRef, texture_unit_ref )
+        elif self._DataType == "Light":
+            glUniform1i( self._VariableRef["lightType"], self._Data.lightType )
+            glUniform3f( self._VariableRef["color"], *self._Data.color )
+            direction = self._Data.getDirection()
+            glUniform3f( self._VariableRef["direction"], *self._Data.direction )
+            position = self._Data.getPosition()
+            glUniform3f( self._VariableRef["position"], *self._Data.position )
+            glUniform3f( self._VariableRef["attenuation"], *self._Data.attenuation )
         else:
             raise Exception(f"Unrecognized uniform type: {self._DataType}")

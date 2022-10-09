@@ -28,3 +28,9 @@ class RectangleGeometry(Geometry):
         t0, t1, t2, t3 = [0, 0], [1, 0], [0, 1], [1, 1]
         texture_data = [t0, t1, t3, t0, t3, t2]
         self.addAttribute("vec2", "a_texCoords", texture_data)
+
+        # normals
+        normal_vector = [0 ,0, 1]
+        normal_data = [normal_vector] * 6
+        self.addAttribute("vec3", "a_vNormal", normal_data)
+        self.addAttribute("vec3", "a_fNormal", normal_data)

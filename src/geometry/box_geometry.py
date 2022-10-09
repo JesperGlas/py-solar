@@ -40,3 +40,11 @@ class BoxGeometry(Geometry):
         t0, t1, t2, t3 = [0, 0], [1, 0], [0, 1], [1, 1]
         texture_data = [t0, t1, t3, t0, t3, t2] * 6
         self.addAttribute("vec2", "a_texCoords", texture_data)
+
+        # normals
+        n0, n1 = [1, 0, 0], [-1, 0, 0]
+        n2, n3 = [0, 1, 0], [0, -1, 0]
+        n4, n5 = [0, 0, 1], [0, 0, -1]
+        normal_data = [n0]*6 + [n1]*6 + [n2]*6, [n3]*6, [n4]*6, [n5]*6
+        self.addAttribute("vec3", "a_vNormal", normal_data)
+        self.addAttribute("vec3", "a_fNormal", normal_data)

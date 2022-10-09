@@ -1,3 +1,4 @@
+import numpy as np
 from typing import List
 from core.matrix import Matrix
 
@@ -78,4 +79,24 @@ class Object3D(object):
         self._Transform.itemset((2, 3), position[2])
 
     def lookAt(self, target_position):
-        self._Transform = Matrix.makeLookAt(self.getWorldPosition(), target_position)
+        self._Transform = Matrix.makeLookAt(
+            self.getWorldPosition(),
+            target_position )
+
+    def getOrientationMatrix(self):
+        return np.array([
+            self._Transform[0][0:3],
+            self._Transform[1][0:3],
+            self._Transform[2][0:3] ])
+
+    def getDirection(self):
+        forward = np.array( [0, 0, -1] )
+        return list( self.getOrientationMatrix() @ forward )
+
+    def setDirection(self, direction) -> None:
+        position = self.getPosition()
+        target_position = [
+            position[0] + direction[0],
+            position[1] + direction[1],
+            position[2] + direction[2] ]
+        self.lookAt( target_position )
