@@ -22,8 +22,8 @@ class LambertMaterial(Material):
         {
             gl_Position = u_proj * u_view * u_model * vec4(a_position, 1.0);
             v_texCoords = a_texCoords;
-            vec3 v_position = vec3(u_model * vec4(a_position, 1));
-            vec3 v_normal = normalize(mat3(u_model) * a_vNormal);
+            v_position = vec3(u_model * vec4(a_position, 1));
+            v_normal = normalize(mat3(u_model) * a_vNormal);
         }
         """
 

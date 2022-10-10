@@ -11,9 +11,11 @@ class PhongMaterial(Material):
         uniform mat4 u_proj;
         uniform mat4 u_view;
         uniform mat4 u_model;
+        
         in vec3 a_position;
         in vec2 a_texCoords;
         in vec3 a_vNormal;
+
         out vec3 v_position;
         out vec2 v_texCoords;
         out vec3 v_normal;
@@ -22,8 +24,8 @@ class PhongMaterial(Material):
         {
             gl_Position = u_proj * u_view * u_model * vec4(a_position, 1.0);
             v_texCoords = a_texCoords;
-            vec3 v_position = vec3(u_model * vec4(a_position, 1));
-            vec3 v_normal = normalize(mat3(u_model) * a_vNormal);
+            v_position = vec3(u_model * vec4(a_position, 1));
+            v_normal = normalize(mat3(u_model) * a_vNormal);
         }
         """
 
@@ -93,9 +95,11 @@ class PhongMaterial(Material):
         uniform vec3 u_color;
         uniform bool u_useTexture;
         uniform sampler2D u_texture;
+
         in vec3 v_position;
         in vec2 v_texCoords;
         in vec3 v_normal;
+        
         out vec4 fragColor;
 
         void main()
