@@ -11,7 +11,7 @@ class PhongMaterial(Material):
         uniform mat4 u_proj;
         uniform mat4 u_view;
         uniform mat4 u_model;
-        
+
         in vec3 a_position;
         in vec2 a_texCoords;
         in vec3 a_vNormal;
@@ -22,9 +22,9 @@ class PhongMaterial(Material):
 
         void main()
         {
-            gl_Position = u_proj * u_view * u_model * vec4(a_position, 1.0);
-            v_texCoords = a_texCoords;
+            gl_Position = u_proj * u_view * u_model * vec4(a_position, 1);
             v_position = vec3(u_model * vec4(a_position, 1));
+            v_texCoords = a_texCoords;
             v_normal = normalize(mat3(u_model) * a_vNormal);
         }
         """
@@ -99,7 +99,7 @@ class PhongMaterial(Material):
         in vec3 v_position;
         in vec2 v_texCoords;
         in vec3 v_normal;
-        
+
         out vec4 fragColor;
 
         void main()
@@ -107,12 +107,12 @@ class PhongMaterial(Material):
             vec4 color = vec4(u_color, 1.0);
             if (u_useTexture)
                 color *= texture2D(u_texture, v_texCoords);
-            vec3 total = vec3(0, 0, 0);
-            total += lightCalc( u_light0, v_position, v_normal );
-            total += lightCalc( u_light1, v_position, v_normal );
-            total += lightCalc( u_light2, v_position, v_normal );
-            total += lightCalc( u_light3, v_position, v_normal );
-            color *= vec4(total, 1);
+            vec3 light = vec3(0, 0, 0);
+            light += lightCalc( u_light0, v_position, v_normal );
+            light += lightCalc( u_light1, v_position, v_normal );
+            light += lightCalc( u_light2, v_position, v_normal );
+            light += lightCalc( u_light3, v_position, v_normal );
+            color *= vec4(light, 1);
 
             fragColor = color;
         }
@@ -131,6 +131,9 @@ class PhongMaterial(Material):
         else:
             self.addUniform("bool", "u_useTexture", True)
             self.addUniform("sampler2D", "u_texture", [texture._TextureRef, 1])
+        self.addUniform("vec3", "u_viewPosition", [0, 0, 0])
+        self.addUniform("float", "u_specularStrength", 1)
+        self.addUniform("float", "u_shininess", 32)
 
         self.locateUniforms()
 
