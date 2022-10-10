@@ -89,19 +89,19 @@ class App(Base):
             "u_color": [0.6, 0.2, 0.2]
         })
         lambert_mat = LambertMaterial( texture=crate_tex )
-        phong_mat = PhongMaterial(properties={
+        phong_mat = PhongMaterial(texture=earth_tex, properties={
             "u_color": [0.5, 0.5, 1.0]
         })
 
         # set up meshes
         sphere1 = Mesh(sphere_geo, flat_mat)
-        sphere1.setPosition([-2.2, 0, 0])
+        sphere1.setPosition([-2.5, 0, 0])
         self._Scene.add(sphere1)
         sphere2 = Mesh(box_geo, lambert_mat)
         sphere2.setPosition([0, 0, 0])
         self._Scene.add(sphere2)
         sphere3 = Mesh(sphere_geo, phong_mat)
-        sphere3.setPosition([2.2, 0, 0])
+        sphere3.setPosition([2.5, 0, 0])
         self._Scene.add(sphere3)
 
         # scene info

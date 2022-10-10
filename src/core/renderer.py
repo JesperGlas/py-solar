@@ -42,18 +42,24 @@ class Renderer(object):
 
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
 
+        # update camera view matrix
         camera.updateViewMatrix()
 
+        # list to hold all descendants of the scene
         descendant_list: List[object] = scene.getDescendantList()
+
+        # list to hold all descendants of the Mesh class
         meshFilter = lambda x : isinstance(x, Mesh)
         mesh_list: List[Mesh] = list( filter(meshFilter, descendant_list) )
 
+        # list to hold all descendants of the Light class
         lightFilter = lambda x : isinstance(x, Light)
         light_list: List[Light] = list( filter(lightFilter, descendant_list) )
         # since 4 lights is specified in shader, exactly 4 is needed
         while len(light_list) < 4:
             light_list.append( Light() )
 
+        # go through all descendants of the scene
         for mesh in mesh_list:
 
             # skip if mesh is not visible

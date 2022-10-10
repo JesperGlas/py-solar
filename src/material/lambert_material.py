@@ -46,43 +46,37 @@ class LambertMaterial(Material):
         uniform Light u_light2;
         uniform Light u_light3;
 
-        vec3 lightCalc(Light light, vec3 pointPosition, vec3 pointNormal)
+        vec3 lightCalc(Light light, vec3 point_position, vec3 point_normal)
         {
             float ambient = 0;
             float diffuse = 0;
             float specular = 0;
-            float attenuation = 0;
-            vec3 lightDirection = vec3(0, 0, 0);
-
-            if (light.lightType == 1) // ambient light
+            float attenuation = 1;
+            vec3 light_direction = vec3(0, 0, 0);
+            
+            if (light.lightType == 1)  // ambient light
             {
                 ambient = 1;
-            }
-            else if (light.lightType == 2) // directional light
+            }                
+            else if (light.lightType == 2)  // directional light
             {
-                lightDirection = normalize(light.direction);
+                light_direction = normalize(light.direction);
             }
-            else if (light.lightType == 3) // point light
+            else if (light.lightType == 3)  // point light 
             {
-                lightDirection = normalize(pointPosition - light.position);
-                float distance = length(light.position - pointPosition);
-                attenuation = 1.0 / (
-                    light.attenuation[0] +
-                    light.attenuation[1] *
-                    distance +
-                    light.attenuation[2] *
-                    distance * distance
-                    );
+                light_direction = normalize(point_position - light.position);
+                float distance = length(light.position - point_position);
+                attenuation = 1.0 / (light.attenuation[0] 
+                                    + light.attenuation[1] * distance 
+                                    + light.attenuation[2] * distance * distance);
             }
-            else if (light.lightType > 1) // directional or point light
+            
+            if (light.lightType > 1)  // directional or point light
             {
-                pointNormal = normalize(pointNormal);
-                diffuse = max(
-                    dot(pointNormal, -lightDirection),
-                    0.0 );
+                point_normal = normalize(point_normal);
+                diffuse = max(dot(point_normal, -light_direction), 0.0);
                 diffuse *= attenuation;
             }
-
             return light.color * (ambient + diffuse + specular);
         }
 

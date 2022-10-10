@@ -5,7 +5,7 @@ class Uniform(object):
 
     def __init__(self, data_type, data) -> None:
         # allowed data types:
-        # int | bool | float | vec2 | vec3 | vec4
+        # int | bool | float | vec2 | vec3 | vec4 | mat4 | sampler2D | Light
         self._DataType = data_type
         self._Data = data
 
@@ -63,10 +63,8 @@ class Uniform(object):
             self._Data: Light
             glUniform1i( self._VariableRef["lightType"], self._Data._LightType )
             glUniform3f( self._VariableRef["color"], *self._Data._LightColor )
-            direction = self._Data.getDirection()
-            glUniform3f( self._VariableRef["direction"], *self._Data._Direction )
-            position = self._Data.getPosition()
-            glUniform3f( self._VariableRef["position"], *self._Data._Position )
+            glUniform3f( self._VariableRef["direction"], *self._Data.getDirection() )
+            glUniform3f( self._VariableRef["position"], *self._Data.getPosition() )
             glUniform3f( self._VariableRef["attenuation"], *self._Data._Attenuation )
         else:
             raise Exception(f"Unrecognized uniform type: {self._DataType}")

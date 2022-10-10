@@ -11,7 +11,3 @@ class Light(Object3D):
         self._LightType     = light_type
         self._LightColor    = [1, 1, 1]
         self._Attenuation   = [1, 0, 0]
-
-        # test
-        self._Direction     = [0, 0, 0]
-        self._Position      = [0, 0, 0]
