@@ -5,7 +5,11 @@ from core.texture import Texture
 
 class LambertMaterial(Material):
 
-    def __init__(self, texture: Texture=None, bump_texture: Texture=None, properties: Dict={}) -> None:
+    def __init__(self,
+        texture: Texture=None,
+        bump_texture: Texture=None,
+        use_shadows: bool=False,
+        properties: Dict={}) -> None:
 
         vs_code: str = """
         uniform mat4 u_proj;
@@ -17,13 +21,38 @@ class LambertMaterial(Material):
         out vec3 v_position;
         out vec2 v_texCoords;
         out vec3 v_normal;
+        
+        struct Shadow
+        {
+            // direction of light that casts shadow
+            vec3 lightDirection;
+            // data from camera that produces depth texture
+            mat4 proj;
+            mat4 view;
+            // texture that stores depth values from shadow camera
+            sampler2D depthTexture;
+            // regions in shadow multiplied by (1-strength)
+            float strength;
+            // reduces unwanted visual artifacts
+            float bias;
+        };
+        
+        uniform bool u_useShadow;
+        uniform Shadow shadow0;
+        out vec3 v_shadowPosition0;
 
         void main()
         {
-            gl_Position = u_proj * u_view * u_model * vec4(a_position, 1.0);
-            v_texCoords = a_texCoords;
+            gl_Position = u_proj * u_view * u_model * vec4(a_position, 1);
             v_position = vec3(u_model * vec4(a_position, 1));
+            v_texCoords = a_texCoords;
             v_normal = normalize(mat3(u_model) * a_vNormal);
+            
+            if (u_useShadow)
+            {
+                vec4 temp0 = shadow0.proj * shadow0.view * u_model * vec4(a_position, 1);
+                v_shadowPosition0 = vec3(temp0);
+            }            
         }
         """
 
@@ -80,6 +109,25 @@ class LambertMaterial(Material):
             return light.color * (ambient + diffuse + specular);
         }
 
+        struct Shadow
+        {
+            // direction of light that casts shadow
+            vec3 lightDirection;
+            // data from camera that produces depth texture
+            mat4 proj;
+            mat4 view;
+            // texture that stores depth values
+            sampler2D depthTexture;
+            // regions in shadow multiplied bu (1-strength)
+            float strength;
+            // reduces unwanted visual effects
+            float bias;
+        };
+
+        uniform bool u_useShadow;
+        uniform Shadow u_shadow0;
+        in vec3 v_shadowPosition0;
+
         uniform vec3 u_color;
         uniform bool u_useTexture;
         uniform sampler2D u_texture;
@@ -110,6 +158,25 @@ class LambertMaterial(Material):
             total += lightCalc( u_light2, v_position, bump_normal );
             total += lightCalc( u_light3, v_position, bump_normal );
             color *= vec4(total, 1);
+
+            if (u_useShadow)
+            {
+                // determine if surface is facing towards light direction
+                float cos_angle = dot(normalize(bump_normal), -normalize(u_shadow0.lightDirection));
+                bool facing_light = (cos_angle > 0.01);
+                // convert range [-1, 1] to range [0, 1]
+                // for UV coordinate and depth information
+                vec3 shadow_coord = (v_shadowPosition0.xyz + 1.0) / 2.0;
+                float closest_distance_to_light = texture2D(u_shadow0.depthTexture, shadow_coord.xy).r;
+                float fragment_distance_to_light = clamp(shadow_coord.z, 0, 1);
+                // determine if fragment lies in shadow of another object
+                bool in_shadow = (fragment_distance_to_light > closest_distance_to_light + u_shadow0.bias);
+                if (facing_light && in_shadow)
+                {
+                    float s = 1.0 - u_shadow0.strength;
+                    color *= vec4(s, s, s, 1);
+                }
+            }
 
             fragColor = color;
         }
@@ -143,6 +210,13 @@ class LambertMaterial(Material):
             self.addUniform("bool", "u_useBumpTexture", True)
             self.addUniform("sampler2D", "u_bumpTexture", [bump_texture._TextureRef, 2])
             self.addUniform("float", "u_bumpStrength", 1.0)
+
+        # add shadow uniforms
+        if not use_shadows:
+            self.addUniform("bool", "u_useShadow", False)
+        else:
+            self.addUniform("bool", "u_useShadow", True)
+            self.addUniform("Shadow", "u_shadow0", None)
 
         self.locateUniforms()
 

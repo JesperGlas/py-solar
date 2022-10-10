@@ -1,6 +1,7 @@
 from OpenGL.GL import *
 from light.light import Light
 
+
 class Uniform(object):
 
     def __init__(self, data_type, data) -> None:
@@ -24,6 +25,20 @@ class Uniform(object):
                 program_ref, f"{variable_name}.position" )
             self._VariableRef["attenuation"] = glGetUniformLocation(
                 program_ref, f"{variable_name}.attenuation" )
+        elif self._DataType == "Shadow":
+            self._VariableRef = {}
+            self._VariableRef["lightDirection"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.lightDirection" )
+            self._VariableRef["projection"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.projection" )
+            self._VariableRef["view"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.view" )
+            self._VariableRef["depthTexture"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.depthTexture" )
+            self._VariableRef["strength"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.strength" )
+            self._VariableRef["bias"] = glGetUniformLocation(
+                program_ref, f"{variable_name}.bias" )
         else:
             self._VariableRef = glGetUniformLocation(program_ref, variable_name)
 
@@ -66,5 +81,19 @@ class Uniform(object):
             glUniform3f( self._VariableRef["direction"], *self._Data.getDirection() )
             glUniform3f( self._VariableRef["position"], *self._Data.getPosition() )
             glUniform3f( self._VariableRef["attenuation"], *self._Data._Attenuation )
+        elif self._DataType == "Shadow":
+            glUniform3f(
+                self._VariableRef["lightDirection"],
+                *self._Data._LightSource.getDirection() )
+            glUniformMatrix4fv(
+                self._VariableRef["projection"],
+                1, GL_TRUE, self._Data._Camera._ViewMatrix )
+            texture_object_ref = self._Data._RenderTarget._Texture._TextureRef
+            texture_unit_ref = 15
+            glActiveTexture( GL_TEXTURE0 + texture_unit_ref )
+            glBindTexture( GL_TEXTURE_2D, texture_object_ref )
+            glUniform1i( self._VariableRef["depthTexture"], texture_unit_ref )
+            glUniform1f( self._VariableRef["strength"], self._Data._Strength )
+            glUniform1f( self._VariableRef["bias"], self._Data._Bias )
         else:
             raise Exception(f"Unrecognized uniform type: {self._DataType}")

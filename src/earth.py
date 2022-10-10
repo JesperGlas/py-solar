@@ -29,6 +29,7 @@ from extras.movement_rig import MovementRig
 from extras.post_processor import PostProcessor
 
 # light
+from light.ambient_light import AmbientLight
 from light.directional_light import DirectionalLight
 
 TITLE: str = "Solarpy"
@@ -60,10 +61,12 @@ class App(Base):
         self._Scene.add(self._CameraRig)
 
         # set up light
-        sun_light = DirectionalLight(
+        self._Ambient = AmbientLight(color=[0.1, 0.1, 0.1])
+        self._Scene.add(self._Ambient)
+        self._SunLight = DirectionalLight(
             color=[0.8, 0.8, 0.8],
-            direction=[1, 1, -2] )
-        self._Scene.add(sun_light)
+            direction=[1, 0, -1] )
+        self._Scene.add(self._SunLight)
 
         # set up geometry
         earth_geo = SphereGeometry(2)
@@ -78,8 +81,8 @@ class App(Base):
         moon_bump = Texture(f"{self._Assets}/moon_bump.jpg")
 
         # set up material
-        earth_mat = LambertMaterial( texture=earth_tex, bump_texture=earth_bump )
-        moon_mat = LambertMaterial( texture=moon_tex, bump_texture=moon_bump )
+        earth_mat = LambertMaterial( texture=earth_tex, bump_texture=earth_bump, use_shadows=True )
+        moon_mat = LambertMaterial( texture=moon_tex, bump_texture=moon_bump, use_shadows=True )
 
         # set up meshes
         self._Earth = Mesh(earth_geo, earth_mat)
@@ -87,11 +90,13 @@ class App(Base):
         self._Scene.add(self._Earth)
 
         self._Moon = Mesh(moon_geo, moon_mat)
-        self._Moon.setPosition([-3, 0, 2])
+        self._Moon.setPosition([-2, 0, 2])
         self._Scene.add(self._Moon)
 
+        # shadows
+        self._Renderer.enableShadows( shadow_light=self._SunLight )
+
         # post processing
-        self._PostProcessing = PostProcessor(self._Renderer, self._Scene, self._Camera)
 
         # scene info
         print(f"Scene info:")
@@ -100,12 +105,11 @@ class App(Base):
     def update(self) -> None:
         # update data
         self._CameraRig.update(self._Input, self._DeltaTime)
-        self._Earth.rotateX(0.002)
-        self._Moon.rotateX(0.001)
+        self._SunLight.rotateX(0.01337)
         
         # update uniforms
 
         # render
-        self._PostProcessing.render()
+        self._Renderer.render(self._Scene, self._Camera)
     
 App().run()
