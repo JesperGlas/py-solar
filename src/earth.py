@@ -18,10 +18,8 @@ from geometry.sphere_geometry import SphereGeometry
 from geometry.rectangle_geometry import RectangleGeometry
 
 # material
-from material.material import Material
-from material.lambert_material import LambertMaterial
+from material.phong_material import PhongMaterial
 from material.surface_material import SurfaceMaterial
-from material.flat_material import FlatMaterial
 
 # texture
 from core.texture import Texture
@@ -75,9 +73,8 @@ class App(Base):
 
         # set up material
         sun_mat = SurfaceMaterial(properties={"u_color": [1, 0, 0]})
-        earth_mat = LambertMaterial( texture=earth_tex, bump_texture=earth_bump, use_shadows=True )
-        moon_mat = LambertMaterial( texture=moon_tex, bump_texture=moon_bump )
-        flat_mat = FlatMaterial()
+        earth_mat = PhongMaterial( texture=earth_tex, bump_texture=earth_bump, use_shadows=True )
+        moon_mat = PhongMaterial( texture=moon_tex, bump_texture=moon_bump )
 
         # set up meshes
         self._Sun = Mesh(sun_geo, sun_mat)
@@ -88,7 +85,7 @@ class App(Base):
         self._Earth.setPosition([0, 0, 0])
         self._Scene.add(self._Earth)
 
-        self._Moon = Mesh(moon_geo, flat_mat)
+        self._Moon = Mesh(moon_geo, moon_mat)
         self._Moon.setPosition([-2, 0, 2])
         self._Scene.add(self._Moon)
 
