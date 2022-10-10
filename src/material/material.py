@@ -1,5 +1,5 @@
 from typing import Dict
-from core.utils import OpenGLUtils
+from core.openGLUtils import OpenGLUtils
 from core.uniform import Uniform
 from OpenGL.GL import *
 

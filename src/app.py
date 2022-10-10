@@ -30,7 +30,7 @@ class App(Base):
         OpenGLUtils.printSystemInfo()
 
         # set up assets path
-        self._Assets = f"{Path(__file__).resolve().parent}/assets/"
+        self._Assets = f"{Path(__file__).resolve().parent}/assets"
         print(f"Assets path set to: {self._Assets}")
 
     def initialize(self) -> None:
@@ -49,7 +49,8 @@ class App(Base):
         self.scene.add(self.dir_light)
 
         geo = SphereGeometry()
-        earth_mat = LambertMaterial( texture=f"{self._Assets}/earth.jpg", use_shadows=True)
+        tex = Texture(f"{self._Assets}/earth.jpg")
+        earth_mat = LambertMaterial( texture=tex, use_shadows=True)
 
         sp1 = Mesh(geo, earth_mat)
         sp1.setPosition([-2, 1, 0])
@@ -62,6 +63,7 @@ class App(Base):
         self.renderer.enableShadows(self.dir_light)
         
     def update(self) -> None:
+        self.dir_light.rotateY(0.01337, False)
         self.rig.update(self._Input, self._DeltaTime)
         self.renderer.render(self.scene, self.camera)
     

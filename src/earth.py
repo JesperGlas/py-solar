@@ -3,7 +3,8 @@ from pathlib import Path
 from typing import Dict
 
 # core
-from core.utils import OpenGLUtils
+from core.openGLUtils import OpenGLUtils
+from core.fileUtils import FileUtils
 from core.base import Base
 from core.renderer import Renderer
 from core.object3D import Object3D
@@ -47,10 +48,6 @@ class App(Base):
         print(f"\nSystem information:")
         OpenGLUtils.printSystemInfo()
 
-        # set up assets path
-        self._Assets = f"{Path(__file__).resolve().parent}/assets/"
-        print(f"Assets path set to: {self._Assets}")
-
     def initialize(self) -> None:
         self._Scene = Scene()
         self._Camera = Camera(aspect_ratio=1280/720)
@@ -68,12 +65,12 @@ class App(Base):
         moon_geo = SphereGeometry(radius=0.5)
 
         # set up textures
-        earth_tex = Texture(f"{self._Assets}/earth.jpg")
-        moon_tex = Texture(f"{self._Assets}/moon.jpg")
+        earth_tex = Texture(FileUtils.getAsset("earth.jpg"))
+        moon_tex = Texture(FileUtils.getAsset("moon.jpg"))
         
         # bump maps
-        earth_bump = Texture(f"{self._Assets}/earth_bump.jpg")
-        moon_bump = Texture(f"{self._Assets}/moon_bump.jpg")
+        earth_bump = Texture(FileUtils.getAsset("earth_bump.jpg"))
+        moon_bump = Texture(FileUtils.getAsset("moon_bump.jpg"))
 
         # set up material
         sun_mat = SurfaceMaterial(properties={"u_color": [1, 0, 0]})

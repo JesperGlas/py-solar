@@ -1,6 +1,5 @@
 from OpenGL.GL import *
 
-
 class Uniform(object):
 
     def __init__(self, data_type, data) -> None:
