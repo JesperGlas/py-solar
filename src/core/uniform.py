@@ -1,4 +1,5 @@
 from OpenGL.GL import *
+from light.light import Light
 
 class Uniform(object):
 
@@ -73,6 +74,7 @@ class Uniform(object):
             #   uniform variable in shader
             glUniform1i( self._VariableRef, texture_unit_ref )
         elif self._DataType == "Light":
+            self._Data: Light
             glUniform1i( self._VariableRef["lightType"],    self._Data._LightType )
             glUniform3f( self._VariableRef["color"],        *self._Data._LightColor )
             glUniform3f( self._VariableRef["direction"],    *self._Data.getDirection() )

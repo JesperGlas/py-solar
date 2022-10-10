@@ -118,7 +118,9 @@ class App(Base):
     def update(self) -> None:
         # update data
         self._CameraRig.update(self._Input, self._DeltaTime)
-        self._SunLight.rotateY(0.01, False)
+        if self._Input.isKeyPressed("space"):
+            self._SunLight.rotateY(0.01, False)
+            
         self._Earth.rotateY(0.002, True)
         self._Moon.rotateY(0.002, True)
         
