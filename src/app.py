@@ -1,10 +1,12 @@
 from math import pi
 from pathlib import Path
+from typing import Dict
 
 # core
 from core.utils import OpenGLUtils
 from core.base import Base
 from core.renderer import Renderer
+from core.object3D import Object3D
 
 # scene
 from core.scene import Scene
@@ -101,6 +103,10 @@ class App(Base):
         sphere3 = Mesh(sphere_geo, phong_mat)
         sphere3.setPosition([2.2, 0, 0])
         self._Scene.add(sphere3)
+
+        # scene info
+        print(f"Scene info:")
+        self._Scene.printNodeTree()
         
     def update(self) -> None:
         # update data

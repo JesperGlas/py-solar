@@ -31,7 +31,7 @@ class FlatMaterial(Material):
             float ambient = 0;
             float diffuse = 0;
             float specular = 0;
-            float attenuation = 0;
+            float attenuation = 1;
             vec3 light_direction = vec3(0, 0, 0);
 
             if (light.lightType == 1) // ambient light
@@ -47,19 +47,15 @@ class FlatMaterial(Material):
                 light_direction = normalize(point_position - light.position);
                 float distance = length(light.position - point_position);
                 attenuation = 1.0 / (
-                    light.attenuation[0] +
-                    light.attenuation[1] *
-                    distance +
-                    light.attenuation[2] *
-                    distance * distance
+                    light.attenuation[0]
+                    + light.attenuation[1] * distance
+                    + light.attenuation[2] * distance * distance
                     );
             }
             else if (light.lightType > 1) // directional or point light
             {
                 point_normal = normalize(point_normal);
-                diffuse = max(
-                    dot(point_normal, -light_direction),
-                    0.0 );
+                diffuse = max( dot(point_normal, -light_direction), 0.0 );
                 diffuse *= attenuation;
             }
 
@@ -79,6 +75,7 @@ class FlatMaterial(Material):
         {
             gl_Position = u_proj * u_view * u_model * vec4(a_position, 1.0);
             v_texCoords = a_texCoords;
+            
             vec3 position = vec3(u_model * vec4(a_position, 1));
             vec3 normal = normalize(mat3(u_model) * a_fNormal);
             v_light = vec3(0, 0, 0);

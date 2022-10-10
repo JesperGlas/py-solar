@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List
+from typing import Dict, List
 from core.matrix import Matrix
 
 class Object3D(object):
@@ -8,6 +8,9 @@ class Object3D(object):
         self._Transform = Matrix.makeIdentity()
         self._Parent: Object3D = None
         self._Children: List[Object3D] = []
+
+    def _type(self):
+        return self.__class__.__name__
 
     def add(self, child: object) -> None:
         self._Children.append(child)
@@ -100,3 +103,8 @@ class Object3D(object):
             position[1] + direction[1],
             position[2] + direction[2] ]
         self.lookAt( target_position )
+
+    def printNodeTree(self, depth: int=0) -> None:
+        print("- " + "\t"*depth + f"{self._type()}")
+        for child in self._Children:
+            child.printNodeTree(depth+1)
