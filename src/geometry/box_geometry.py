@@ -45,6 +45,6 @@ class BoxGeometry(Geometry):
         n0, n1 = [1, 0, 0], [-1, 0, 0]
         n2, n3 = [0, 1, 0], [0, -1, 0]
         n4, n5 = [0, 0, 1], [0, 0, -1]
-        normal_data = [n0]*6 + [n1]*6 + [n2]*6, [n3]*6, [n4]*6, [n5]*6
+        normal_data = [n0]*6 + [n1]*6 + [n2]*6 + [n3]*6 + [n4]*6 + [n5]*6
         self.addAttribute("vec3", "a_vNormal", normal_data)
         self.addAttribute("vec3", "a_fNormal", normal_data)

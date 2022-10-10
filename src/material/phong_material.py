@@ -3,11 +3,31 @@ from OpenGL.GL import *
 from material.material import Material
 from core.texture import Texture
 
-class FlatMaterial(Material):
+class PhongMaterial(Material):
 
     def __init__(self, texture: Texture=None, properties: Dict={}) -> None:
 
         vs_code: str = """
+        uniform mat4 u_proj;
+        uniform mat4 u_view;
+        uniform mat4 u_model;
+        in vec3 a_position;
+        in vec2 a_texCoords;
+        in vec3 a_vNormal;
+        out vec3 v_position;
+        out vec2 v_texCoords;
+        out vec3 v_normal;
+
+        void main()
+        {
+            gl_Position = u_proj * u_view * u_model * vec4(a_position, 1.0);
+            v_texCoords = a_texCoords;
+            vec3 v_position = vec3(u_model * vec4(a_position, 1));
+            vec3 v_normal = normalize(mat3(u_model) * a_vNormal);
+        }
+        """
+
+        fs_code: str = """
         struct Light
         {
             // 1=AMBIENT, 2=DIRECTIONAL, 3=POINT
@@ -25,6 +45,9 @@ class FlatMaterial(Material):
         uniform Light u_light1;
         uniform Light u_light2;
         uniform Light u_light3;
+        uniform vec3 u_viewPosition;
+        uniform float u_specularStrength;
+        uniform float u_shininess;
 
         vec3 lightCalc(Light light, vec3 point_position, vec3 point_normal)
         {
@@ -58,43 +81,29 @@ class FlatMaterial(Material):
             {
                 point_normal = normalize(point_normal);
                 diffuse = max(
-                    dot(point_normal, -light_direction),
+                    dot(point_normal, - light_direction),
                     0.0 );
                 diffuse *= attenuation;
+                if (diffuse > 0)
+                {
+                    vec3 view_direction = normalize(u_viewPosition - point_position);
+                    vec3 reflect_direction = reflect(light_direction, point_normal);
+                    specular = max(
+                        dot(view_direction, reflect_direction),
+                        0.0);
+                    specular = u_specularStrength * pow(specular, u_shininess);
+                }
             }
 
             return light.color * (ambient + diffuse + specular);
         }
 
-        uniform mat4 u_proj;
-        uniform mat4 u_view;
-        uniform mat4 u_model;
-        in vec3 a_position;
-        in vec2 a_texCoords;
-        in vec3 a_fNormal;
-        out vec2 v_texCoords;
-        out vec3 v_light;
-
-        void main()
-        {
-            gl_Position = u_proj * u_view * u_model * vec4(a_position, 1.0);
-            v_texCoords = a_texCoords;
-            vec3 position = vec3(u_model * vec4(a_position, 1));
-            vec3 normal = normalize(mat3(u_model) * a_fNormal);
-            v_light = vec3(0, 0, 0);
-            v_light += lightCalc(u_light0, position, normal);
-            v_light += lightCalc(u_light1, position, normal);
-            v_light += lightCalc(u_light2, position, normal);
-            v_light += lightCalc(u_light3, position, normal);
-        }
-        """
-
-        fs_code: str = """
         uniform vec3 u_color;
         uniform bool u_useTexture;
         uniform sampler2D u_texture;
+        in vec3 v_position;
         in vec2 v_texCoords;
-        in vec3 v_light;
+        in vec3 v_normal;
         out vec4 fragColor;
 
         void main()
@@ -102,7 +111,13 @@ class FlatMaterial(Material):
             vec4 color = vec4(u_color, 1.0);
             if (u_useTexture)
                 color *= texture2D(u_texture, v_texCoords);
-            color *= vec4(v_light, 1);
+            vec3 total = vec3(0, 0, 0);
+            total += lightCalc( u_light0, v_position, v_normal );
+            total += lightCalc( u_light1, v_position, v_normal );
+            total += lightCalc( u_light2, v_position, v_normal );
+            total += lightCalc( u_light3, v_position, v_normal );
+            color *= vec4(total, 1);
+
             fragColor = color;
         }
         """

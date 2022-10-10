@@ -1,7 +1,7 @@
-from light.base_light import BaseLight
+from light.light import Light
 
-class AmbientLight(BaseLight):
+class AmbientLight(Light):
 
-    def __init__(self, light_color=[1, 1, 1]) -> None:
-        super().__init__(BaseLight.AMBIENT)
-        self._LightColor = light_color
+    def __init__(self, color=[1, 1, 1]) -> None:
+        super().__init__(Light.AMBIENT)
+        self._LightColor = color

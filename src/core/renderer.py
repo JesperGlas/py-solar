@@ -7,6 +7,7 @@ from core.uniform import Uniform
 
 import pygame as pg
 from core.render_target import RenderTarget
+from light.light import Light
 
 class Renderer(object):
 
@@ -45,9 +46,14 @@ class Renderer(object):
 
         descendant_list: List[object] = scene.getDescendantList()
         meshFilter = lambda x : isinstance(x, Mesh)
-        mesh_list: List[Mesh] = list(filter(meshFilter, descendant_list))
+        mesh_list: List[Mesh] = list( filter(meshFilter, descendant_list) )
 
-        mesh: Mesh
+        lightFilter = lambda x : isinstance(x, Light)
+        light_list: List[Light] = list( filter(lightFilter, descendant_list) )
+        # since 4 lights is specified in shader, exactly 4 is needed
+        while len(light_list) < 4:
+            light_list.append( Light() )
+
         for mesh in mesh_list:
 
             # skip if mesh is not visible
@@ -63,6 +69,16 @@ class Renderer(object):
             mesh._Material._Uniforms["u_model"]._Data = mesh.getWorldMatrix()
             mesh._Material._Uniforms["u_view"]._Data = camera._ViewMatrix
             mesh._Material._Uniforms["u_proj"]._Data = camera._ProjectionMatrix
+
+            # light
+            if "u_light0" in mesh._Material._Uniforms.keys():
+                for light_n in range(4):
+                    light_name = f"u_light{light_n}"
+                    light_obj = light_list[light_n]
+                    mesh._Material._Uniforms[light_name]._Data = light_obj
+            # add camera position if needed for specular
+            if "u_viewPosition" in mesh._Material._Uniforms.keys():
+                mesh._Material._Uniforms["u_viewPosition"]._Data = camera.getWorldPosition()
 
             # update uniforms stored in material
             uniform_object: Uniform
