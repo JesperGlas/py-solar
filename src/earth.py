@@ -7,7 +7,6 @@ from core.openGLUtils import OpenGLUtils
 from core.fileUtils import FileUtils
 from core.base import Base
 from core.renderer import Renderer
-from core.object3D import Object3D
 
 # scene
 from core.scene import Scene
@@ -22,6 +21,7 @@ from geometry.rectangle_geometry import RectangleGeometry
 from material.material import Material
 from material.lambert_material import LambertMaterial
 from material.surface_material import SurfaceMaterial
+from material.flat_material import FlatMaterial
 
 # texture
 from core.texture import Texture
@@ -47,6 +47,7 @@ class App(Base):
         # print system information
         print(f"\nSystem information:")
         OpenGLUtils.printSystemInfo()
+        FileUtils.setProjectRoot()
 
     def initialize(self) -> None:
         self._Scene = Scene()
@@ -76,6 +77,7 @@ class App(Base):
         sun_mat = SurfaceMaterial(properties={"u_color": [1, 0, 0]})
         earth_mat = LambertMaterial( texture=earth_tex, bump_texture=earth_bump, use_shadows=True )
         moon_mat = LambertMaterial( texture=moon_tex, bump_texture=moon_bump )
+        flat_mat = FlatMaterial()
 
         # set up meshes
         self._Sun = Mesh(sun_geo, sun_mat)
@@ -86,7 +88,7 @@ class App(Base):
         self._Earth.setPosition([0, 0, 0])
         self._Scene.add(self._Earth)
 
-        self._Moon = Mesh(moon_geo, moon_mat)
+        self._Moon = Mesh(moon_geo, flat_mat)
         self._Moon.setPosition([-2, 0, 2])
         self._Scene.add(self._Moon)
 

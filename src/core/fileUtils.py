@@ -2,18 +2,27 @@ import pathlib as pl
 
 class FileUtils(object):
 
-    @staticmethod
-    def pathRoot() -> str:
-        return pl.Path(__file__).resolve().parent.parent
+    @classmethod
+    def setProjectRoot(cls) -> None:
+        cls._ProjectRoot: str = pl.Path(__file__).resolve().parent.parent
+        print(f"Project root dir is set to: {cls._ProjectRoot}")
 
-    @staticmethod
-    def pathAssets() -> str:
-        return f"{FileUtils.pathRoot()}/assets"
+    @classmethod
+    def pathRoot(cls) -> str:
+        return cls._ProjectRoot
 
-    @staticmethod
-    def pathShaders() -> str:
-        return f"{FileUtils.pathRoot()}/shaders"
+    @classmethod
+    def pathAssetsRoot(cls) -> str:
+        return f"{cls._ProjectRoot}/assets"
 
-    @staticmethod
-    def getAsset(file_name: str) -> str:
-        return f"{FileUtils.pathAssets()}/{file_name}"
+    @classmethod
+    def pathShadersRoot(cls) -> str:
+        return f"{cls._ProjectRoot}/shaders"
+
+    @classmethod
+    def getAsset(cls, file_name: str) -> str:
+        return f"{FileUtils.pathAssetsRoot()}/{file_name}"
+
+    @classmethod
+    def getShaderDir(cls, shader_name: str) -> str:
+        return f"{FileUtils.pathShadersRoot()}/{shader_name}"
