@@ -32,7 +32,8 @@ from light.directional_light import DirectionalLight
 
 # postprocessing
 from extras.post_processor import PostProcessor
-from effects.tint_effect import TintEffect
+from effects.bright_filter_effect import BrightFilterEffect
+from effects.horizontal_blur_effect import HorizontalBlurEffect
 
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
@@ -87,7 +88,7 @@ class App(Base):
 
         # post processing
         self._PostProcessor = PostProcessor(self._Renderer, self._Scene, self._Camera)
-        self._PostProcessor.addEffect(TintEffect(tint_color=[1, 0, 0]))
+        self._PostProcessor.addEffect(HorizontalBlurEffect(blur_radius=5))
 
         # scene info
         print(f"Scene info:")
