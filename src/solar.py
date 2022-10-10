@@ -30,6 +30,10 @@ from extras.movement_rig import MovementRig
 # light
 from light.directional_light import DirectionalLight
 
+# postprocessing
+from extras.post_processor import PostProcessor
+from effects.tint_effect import TintEffect
+
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
 AUTHOR: str = "Jesper Glas"
@@ -81,6 +85,10 @@ class App(Base):
         self._Earth.setPosition([0, 0, 0])
         self._Scene.add(self._Earth)
 
+        # post processing
+        self._PostProcessor = PostProcessor(self._Renderer, self._Scene, self._Camera)
+        self._PostProcessor.addEffect(TintEffect(tint_color=[1, 0, 0]))
+
         # scene info
         print(f"Scene info:")
         self._Scene.printNodeTree()
@@ -93,6 +101,6 @@ class App(Base):
         # update uniforms
 
         # render
-        self._Renderer.render(self._Scene, self._Camera)
+        self._PostProcessor.render()
     
 App().run()
