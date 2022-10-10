@@ -1,5 +1,4 @@
 from OpenGL.GL import *
-from light.light import Light
 
 
 class Uniform(object):
@@ -75,18 +74,19 @@ class Uniform(object):
             #   uniform variable in shader
             glUniform1i( self._VariableRef, texture_unit_ref )
         elif self._DataType == "Light":
-            self._Data: Light
-            glUniform1i( self._VariableRef["lightType"], self._Data._LightType )
-            glUniform3f( self._VariableRef["color"], *self._Data._LightColor )
-            glUniform3f( self._VariableRef["direction"], *self._Data.getDirection() )
-            glUniform3f( self._VariableRef["position"], *self._Data.getPosition() )
-            glUniform3f( self._VariableRef["attenuation"], *self._Data._Attenuation )
+            glUniform1i( self._VariableRef["lightType"],    self._Data._LightType )
+            glUniform3f( self._VariableRef["color"],        *self._Data._LightColor )
+            glUniform3f( self._VariableRef["direction"],    *self._Data.getDirection() )
+            glUniform3f( self._VariableRef["position"],     *self._Data.getPosition() )
+            glUniform3f( self._VariableRef["attenuation"],  *self._Data._Attenuation )
         elif self._DataType == "Shadow":
-            glUniform3f(
-                self._VariableRef["lightDirection"],
-                *self._Data._LightSource.getDirection() )
+            direction = self._Data._LightSource.getDirection()
+            glUniform3f( self._VariableRef["lightDirection"], *direction )
             glUniformMatrix4fv(
                 self._VariableRef["projection"],
+                1, GL_TRUE, self._Data._Camera._ProjectionMatrix )
+            glUniformMatrix4fv(
+                self._VariableRef["view"],
                 1, GL_TRUE, self._Data._Camera._ViewMatrix )
             texture_object_ref = self._Data._RenderTarget._Texture._TextureRef
             texture_unit_ref = 15

@@ -12,33 +12,20 @@ from light.shadow import Shadow
 
 class Renderer(object):
 
-    def __init__(self, scene: Scene, camera: Camera, clear_color=True, clear_depth=True) -> None:
-        
+    def __init__(self, clear_color=[0, 0, 0]) -> None:
         glEnable( GL_DEPTH_TEST )
         glEnable( GL_MULTISAMPLE )
-        
-        # clear color and depth buffer
-        if clear_color:
-            glClear( GL_COLOR_BUFFER_BIT )
-        if clear_depth:
-            glClear( GL_DEPTH_BUFFER_BIT )
-        
-        # for textures
-        glEnable( GL_BLEND )
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
-
+        glClearColor(*clear_color, 1)
         # render taget modifications
         self._WindowSize = pg.display.get_surface().get_size()
-
         # shadow
-        self._shadowsEnabled = False
+        self._ShadowsEnabled = False
 
     def enableShadows(self, shadow_light: Light, strength=0.5, resolution=[512, 512], bias=0.001) -> None:
-        self._shadowsEnabled = True
-        self._shadowObject = Shadow(shadow_light, strength=strength, resolution=resolution, bias=bias)
+        self._ShadowsEnabled = True
+        self._ShadowObject = Shadow(light_source=shadow_light, strength=strength, resolution=resolution, bias=bias)
 
-    def render(self, scene: Scene, camera: Camera, render_target: RenderTarget=None) -> None:
-
+    def render(self, scene: Scene, camera: Camera, clear_color: bool=True, clear_depth: bool=True, render_target: RenderTarget=None) -> None:
         # shadows
         # filter descendants
         descendants_list = scene.getDescendantList()
@@ -46,23 +33,23 @@ class Renderer(object):
         mesh_list = list( filter(meshFilter, descendants_list) )
 
         # shadow pass
-        if self._shadowsEnabled:
+        if self._ShadowsEnabled:
             # set render target properties
             glBindFramebuffer( GL_FRAMEBUFFER,
-                self._shadowObject._RenderTarget._FramebufferRef )
+                self._ShadowObject._RenderTarget._FramebufferRef )
             glViewport(0, 0,
-                self._shadowObject._RenderTarget._Width,
-                self._shadowObject._RenderTarget._Height )
+                self._ShadowObject._RenderTarget._Width,
+                self._ShadowObject._RenderTarget._Height )
             
             # set default color to white
-            glClearColor(0, 0, 0, 0)
+            glClearColor(1, 1, 1, 1)
             glClear( GL_COLOR_BUFFER_BIT )
             glClear( GL_DEPTH_BUFFER_BIT )
 
             # everything in scene gets rendered with depthMaterial
             #   so only need to call glUseProgram once
-            glUseProgram(self._shadowObject._Material._ProgramRef)
-            self._shadowObject.updateInternal()
+            glUseProgram(self._ShadowObject._Material._ProgramRef)
+            self._ShadowObject.updateInternal()
 
             mesh: Mesh
             for mesh in mesh_list:
@@ -78,11 +65,11 @@ class Renderer(object):
                 glBindVertexArray( mesh._VaoRef )
 
                 # update transform data
-                self._shadowObject._Material._Uniforms["u_model"]._Data = mesh.getWorldMatrix()
+                self._ShadowObject._Material._Uniforms["u_model"]._Data = mesh.getWorldMatrix()
 
                 # update uniforms (matrix data) stored in shadow material
                 uniform_obj: Uniform
-                for variable_name, uniform_obj in self._shadowObject._Material._Uniforms.items():
+                for variable_name, uniform_obj in self._ShadowObject._Material._Uniforms.items():
                     uniform_obj.uploadData()
             
             glDrawArrays( GL_TRIANGLES, 0, mesh._Geometry._VertexCount )
@@ -97,7 +84,14 @@ class Renderer(object):
             glBindFramebuffer(GL_FRAMEBUFFER, render_target._FramebufferRef)
             glViewport(0, 0, render_target._Width, render_target._Height)
 
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
+        if clear_color:
+            glClear( GL_COLOR_BUFFER_BIT )
+        if clear_depth:
+            glClear( GL_DEPTH_BUFFER_BIT )
+
+        # blending
+        glEnable( GL_BLEND )
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA )
 
         # update camera view matrix
         camera.updateViewMatrix()
@@ -145,8 +139,8 @@ class Renderer(object):
 
             # shadow
             #   add shadow data if enabled and used by shader
-            if self._shadowsEnabled and ("u_shadow0" in mesh._Material._Uniforms.keys()):
-                mesh._Material._Uniforms["u_shadow0"]._Data = self._shadowObject
+            if self._ShadowsEnabled and ("u_shadow0" in mesh._Material._Uniforms.keys()):
+                mesh._Material._Uniforms["u_shadow0"]._Data = self._ShadowObject
 
             # update uniforms stored in material
             uniform_object: Uniform

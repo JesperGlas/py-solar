@@ -1,40 +1,20 @@
-from math import pi
 from pathlib import Path
-from typing import Dict
 
 # core
 from core.utils import OpenGLUtils
 from core.base import Base
 from core.renderer import Renderer
-from core.object3D import Object3D
-
-# scene
 from core.scene import Scene
 from core.camera import Camera
 from core.mesh import Mesh
-
-# geometry
-from geometry.sphere_geometry import SphereGeometry
-from geometry.box_geometry import BoxGeometry
-
-# material
-from material.material import Material
-from material.surface_material import SurfaceMaterial
-from material.flat_material import FlatMaterial
-from material.lambert_material import LambertMaterial
-from material.phong_material import PhongMaterial
-
-# texture
 from core.texture import Texture
-from material.texture_material import TextureMaterial
-
-# extra
-from extras.movement_rig import MovementRig
-
-# light
 from light.ambient_light import AmbientLight
 from light.directional_light import DirectionalLight
-from light.point_light import PointLight
+from material.lambert_material import LambertMaterial
+from geometry.sphere_geometry import SphereGeometry
+from geometry.rectangle_geometry import RectangleGeometry
+from extras.movement_rig import MovementRig
+
 
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
@@ -54,73 +34,35 @@ class App(Base):
         print(f"Assets path set to: {self._Assets}")
 
     def initialize(self) -> None:
-        self._Renderer = Renderer()
-        self._Scene = Scene()
-        self._Camera = Camera(aspect_ratio=1280/720)
-        
-        # setup moving camera position
-        self._CameraRig = MovementRig()
-        self._CameraRig.add(self._Camera)
-        self._CameraRig.setPosition([0, 0, 6])
-        self._Scene.add(self._CameraRig)
+        self.renderer = Renderer([0.2, 0.2, 0.2])
+        self.scene = Scene()
+        self.camera = Camera(aspect_ratio=1280/720)
+        self.rig = MovementRig()
+        self.rig.add(self.camera)
+        self.rig.setPosition([0, 2, 5])
 
-        # set up light
-        ambient = AmbientLight( color=[0.1, 0.1, 0.1] )
-        self._Scene.add(ambient)
-        directional = DirectionalLight(
-            color=[0.8, 0.8, 0.8],
-            direction=[-1, -1, -2] )
-        self._Scene.add(directional)
-        point = PointLight(
-            color=[0.9, 0, 0],
-            position=[1, 1, 0.8] )
-        self._Scene.add(point)
+        amb_light = AmbientLight(color=[0.2, 0.2, 0.2])
+        self.scene.add(amb_light)
 
-        # set up geometry
-        sphere_geo = SphereGeometry()
-        box_geo = BoxGeometry(width=1.5, height=1.5, depth=1.5)
+        self.dir_light = DirectionalLight(direction=[-1, -1, 0])
+        self.dir_light.setPosition([2, 4, 0])
+        self.scene.add(self.dir_light)
 
-        # set up textures
-        earth_tex = Texture(f"{self._Assets}/earth.jpg")
-        crate_tex = Texture(f"{self._Assets}/crate.jpg")
-        
-        # bump maps
-        earth_bump = Texture(f"{self._Assets}/earth_bump.jpg")
+        geo = SphereGeometry()
+        earth_mat = LambertMaterial( texture=f"{self._Assets}/earth.jpg", use_shadows=True)
 
-        # set up material
-        flat_mat = FlatMaterial(properties={
-            "u_color": [0.6, 0.2, 0.2]
-        })
-        lambert_mat = LambertMaterial( texture=earth_tex )
-        phong_mat = PhongMaterial(
-            texture=earth_tex,
-            bump_texture=earth_bump,
-            properties={
-            "u_color": [0.5, 0.5, 1.0]
-        })
+        sp1 = Mesh(geo, earth_mat)
+        sp1.setPosition([-2, 1, 0])
+        self.scene.add(sp1)
 
-        # set up meshes
-        sphere1 = Mesh(sphere_geo, flat_mat)
-        sphere1.setPosition([-2.5, 0, 0])
-        self._Scene.add(sphere1)
-        sphere2 = Mesh(sphere_geo, lambert_mat)
-        sphere2.setPosition([0, 0, 0])
-        self._Scene.add(sphere2)
-        sphere3 = Mesh(sphere_geo, phong_mat)
-        sphere3.setPosition([2.5, 0, 0])
-        self._Scene.add(sphere3)
+        sp2 = Mesh(geo, earth_mat)
+        sp2.setPosition([1, 2.2, -0.5])
+        self.scene.add(sp2)
 
-        # scene info
-        print(f"Scene info:")
-        self._Scene.printNodeTree()
+        self.renderer.enableShadows(self.dir_light)
         
     def update(self) -> None:
-        # update data
-        self._CameraRig.update(self._Input, self._DeltaTime)
-        
-        # update uniforms
-
-        # render
-        self._Renderer.render(self._Scene, self._Camera)
+        self.rig.update(self._Input, self._DeltaTime)
+        self.renderer.render(self.scene, self.camera)
     
 App().run()
