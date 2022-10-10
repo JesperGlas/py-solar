@@ -15,14 +15,10 @@ from core.mesh import Mesh
 
 # geometry
 from geometry.sphere_geometry import SphereGeometry
-from geometry.box_geometry import BoxGeometry
 
 # material
 from material.material import Material
-from material.surface_material import SurfaceMaterial
-from material.flat_material import FlatMaterial
 from material.lambert_material import LambertMaterial
-from material.phong_material import PhongMaterial
 
 # texture
 from core.texture import Texture
@@ -32,9 +28,7 @@ from material.texture_material import TextureMaterial
 from extras.movement_rig import MovementRig
 
 # light
-from light.ambient_light import AmbientLight
 from light.directional_light import DirectionalLight
-from light.point_light import PointLight
 
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
@@ -54,9 +48,9 @@ class App(Base):
         print(f"Assets path set to: {self._Assets}")
 
     def initialize(self) -> None:
-        self._Renderer = Renderer()
         self._Scene = Scene()
         self._Camera = Camera(aspect_ratio=1280/720)
+        self._Renderer = Renderer(self._Scene, self._Camera)
         
         # setup moving camera position
         self._CameraRig = MovementRig()
@@ -65,50 +59,27 @@ class App(Base):
         self._Scene.add(self._CameraRig)
 
         # set up light
-        ambient = AmbientLight( color=[0.1, 0.1, 0.1] )
-        self._Scene.add(ambient)
-        directional = DirectionalLight(
+        sun_light = DirectionalLight(
             color=[0.8, 0.8, 0.8],
-            direction=[-1, -1, -2] )
-        self._Scene.add(directional)
-        point = PointLight(
-            color=[0.9, 0, 0],
-            position=[1, 1, 0.8] )
-        self._Scene.add(point)
+            direction=[1, 1, -2] )
+        self._Scene.add(sun_light)
 
         # set up geometry
         sphere_geo = SphereGeometry()
-        box_geo = BoxGeometry(width=1.5, height=1.5, depth=1.5)
 
         # set up textures
-        earth_tex = Texture(f"{self._Assets}/earth.jpg")
-        crate_tex = Texture(f"{self._Assets}/crate.jpg")
+        earth_tex = Texture(f"{self._Assets}/sun.jpg")
         
         # bump maps
         earth_bump = Texture(f"{self._Assets}/earth_bump.jpg")
 
         # set up material
-        flat_mat = FlatMaterial(properties={
-            "u_color": [0.6, 0.2, 0.2]
-        })
         lambert_mat = LambertMaterial( texture=earth_tex )
-        phong_mat = PhongMaterial(
-            texture=earth_tex,
-            bump_texture=earth_bump,
-            properties={
-            "u_color": [0.5, 0.5, 1.0]
-        })
 
         # set up meshes
-        sphere1 = Mesh(sphere_geo, flat_mat)
-        sphere1.setPosition([-2.5, 0, 0])
-        self._Scene.add(sphere1)
-        sphere2 = Mesh(sphere_geo, lambert_mat)
-        sphere2.setPosition([0, 0, 0])
-        self._Scene.add(sphere2)
-        sphere3 = Mesh(sphere_geo, phong_mat)
-        sphere3.setPosition([2.5, 0, 0])
-        self._Scene.add(sphere3)
+        self._Earth = Mesh(sphere_geo, lambert_mat)
+        self._Earth.setPosition([0, 0, 0])
+        self._Scene.add(self._Earth)
 
         # scene info
         print(f"Scene info:")
@@ -117,6 +88,7 @@ class App(Base):
     def update(self) -> None:
         # update data
         self._CameraRig.update(self._Input, self._DeltaTime)
+        self._Earth.rotateX(0.002)
         
         # update uniforms
 

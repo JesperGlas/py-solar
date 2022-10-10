@@ -5,7 +5,7 @@ from core.texture import Texture
 
 class LambertMaterial(Material):
 
-    def __init__(self, texture: Texture=None, properties: Dict={}) -> None:
+    def __init__(self, texture: Texture=None, bump_texture: Texture=None, properties: Dict={}) -> None:
 
         vs_code: str = """
         uniform mat4 u_proj;
@@ -83,6 +83,10 @@ class LambertMaterial(Material):
         uniform vec3 u_color;
         uniform bool u_useTexture;
         uniform sampler2D u_texture;
+        uniform bool u_useBumpTexture;
+        uniform sampler2D u_bumpTexture;
+        uniform float u_bumpStrength;
+        
         in vec3 v_position;
         in vec2 v_texCoords;
         in vec3 v_normal;
@@ -93,11 +97,18 @@ class LambertMaterial(Material):
             vec4 color = vec4(u_color, 1.0);
             if (u_useTexture)
                 color *= texture2D(u_texture, v_texCoords);
+
+            vec3 bump_normal = v_normal;
+            if (u_useBumpTexture)
+                bump_normal += u_bumpStrength * vec3(
+                    texture2D(u_bumpTexture, v_texCoords)
+                );
+            
             vec3 total = vec3(0, 0, 0);
-            total += lightCalc( u_light0, v_position, v_normal );
-            total += lightCalc( u_light1, v_position, v_normal );
-            total += lightCalc( u_light2, v_position, v_normal );
-            total += lightCalc( u_light3, v_position, v_normal );
+            total += lightCalc( u_light0, v_position, bump_normal );
+            total += lightCalc( u_light1, v_position, bump_normal );
+            total += lightCalc( u_light2, v_position, bump_normal );
+            total += lightCalc( u_light3, v_position, bump_normal );
             color *= vec4(total, 1);
 
             fragColor = color;
@@ -105,21 +116,33 @@ class LambertMaterial(Material):
         """
         super().__init__(vs_code, fs_code)
         
-        # add uniforms
+        # add base uniforms
         self.addUniform("vec3", "u_color", [1.0, 1.0, 1.0])
+
+        # add light uniforms
         self.addUniform("Light", "u_light0", None)
         self.addUniform("Light", "u_light1", None)
         self.addUniform("Light", "u_light2", None)
         self.addUniform("Light", "u_light3", None)
+        self.addUniform("vec3", "u_viewPosition", [0, 0, 0])
+        self.addUniform("float", "u_specularStrength", 1)
+        self.addUniform("float", "u_shininess", 32)
+
+        # add texture uniforms
         self.addUniform("bool", "u_useTexture", 0)
         if texture == None:
             self.addUniform("bool", "u_useTexture", False)
         else:
             self.addUniform("bool", "u_useTexture", True)
             self.addUniform("sampler2D", "u_texture", [texture._TextureRef, 1])
-        self.addUniform("vec3", "u_viewPosition", [0, 0, 0])
-        self.addUniform("float", "u_specularStrength", 1)
-        self.addUniform("float", "u_shininess", 32)
+
+        # add bumpmap uniforms
+        if bump_texture == None:
+            self.addUniform("bool", "u_useBumpTexture", False)
+        else:
+            self.addUniform("bool", "u_useBumpTexture", True)
+            self.addUniform("sampler2D", "u_bumpTexture", [bump_texture._TextureRef, 2])
+            self.addUniform("float", "u_bumpStrength", 1.0)
 
         self.locateUniforms()
 

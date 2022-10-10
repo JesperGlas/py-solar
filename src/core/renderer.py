@@ -11,15 +11,16 @@ from light.light import Light
 
 class Renderer(object):
 
-    def __init__(self, clear_color = [0, 0, 0]) -> None:
+    def __init__(self, scene: Scene, camera: Camera, clear_color=True, clear_depth=True) -> None:
         
         glEnable( GL_DEPTH_TEST )
         glEnable( GL_MULTISAMPLE )
-        glClearColor(
-            clear_color[0],
-            clear_color[1],
-            clear_color[2],
-            1 )
+        
+        # clear color and depth buffer
+        if clear_color:
+            glClear( GL_COLOR_BUFFER_BIT )
+        if clear_depth:
+            glClear( GL_DEPTH_BUFFER_BIT )
         
         # for textures
         glEnable( GL_BLEND )

@@ -22,9 +22,9 @@ class App(Base):
         OpenGLUtils.printSystemInfo()
 
     def initialize(self) -> None:
-        self._Renderer = Renderer()
         self._Scene = Scene()
         self._Camera = Camera(aspect_ratio=1280/720)
+        self._Renderer = Renderer(self._Scene, self._Camera)
         
         # set camera position
         self._Rig = MovementRig()
