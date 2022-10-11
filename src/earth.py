@@ -18,6 +18,7 @@ from geometry.sphere_geometry import SphereGeometry
 from geometry.rectangle_geometry import RectangleGeometry
 
 # material
+from material.lambert_material import LambertMaterial
 from material.phong_material import PhongMaterial
 from material.surface_material import SurfaceMaterial
 
@@ -55,7 +56,7 @@ class App(Base):
         # setup moving camera position
         self._CameraRig = MovementRig()
         self._CameraRig.add(self._Camera)
-        self._CameraRig.setPosition([0, 0, 6])
+        self._CameraRig.setPosition([0, 0, 8])
         self._Scene.add(self._CameraRig)
 
         # set up geometry
@@ -73,8 +74,8 @@ class App(Base):
 
         # set up material
         sun_mat = SurfaceMaterial(properties={"u_color": [1, 0, 0]})
-        earth_mat = PhongMaterial( texture=earth_tex, bump_texture=earth_bump, use_shadows=True )
-        moon_mat = PhongMaterial( texture=moon_tex, bump_texture=moon_bump )
+        earth_mat = LambertMaterial( texture=earth_tex, bump_texture=earth_bump, use_shadows=True )
+        moon_mat = PhongMaterial( texture=moon_tex, bump_texture=moon_bump, use_shadows=True )
 
         # set up meshes
         self._Sun = Mesh(sun_geo, sun_mat)
@@ -86,7 +87,7 @@ class App(Base):
         self._Scene.add(self._Earth)
 
         self._Moon = Mesh(moon_geo, moon_mat)
-        self._Moon.setPosition([-2, 0, 2])
+        self._Moon.setPosition([-3, 0, 3])
         self._Scene.add(self._Moon)
 
         # set up light
@@ -99,7 +100,7 @@ class App(Base):
         self._Scene.add(self._SunLight)
 
         # shadows
-        self._Renderer.enableShadows( shadow_light=self._SunLight, resolution=[1280, 720] )
+        self._Renderer.enableShadows( shadow_light=self._SunLight, strength=1, resolution=[1280, 720], bias=1 )
 
         # post processing
         
@@ -119,8 +120,8 @@ class App(Base):
         # update data
         self._CameraRig.update(self._Input, self._DeltaTime)
         if self._Input.isKeyPressed("space"):
-            self._SunLight.rotateY(0.01, False)
-            
+            self._SunLight.rotateY(-0.02, False)
+
         self._Earth.rotateY(0.002, True)
         self._Moon.rotateY(0.002, True)
         

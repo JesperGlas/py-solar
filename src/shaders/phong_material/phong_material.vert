@@ -24,19 +24,19 @@ struct Shadow
 };
 
 uniform bool u_useShadow;
-uniform Shadow shadow0;
+uniform Shadow u_shadow0;
 out vec3 v_shadowPosition0;
 
 void main()
 {
     gl_Position = u_proj * u_view * u_model * vec4(a_position, 1);
-    v_position = vec3(u_model * vec4(a_position, 1));
+    v_position = vec3(u_view * vec4(a_position, 1));
     v_texCoords = a_texCoords;
     v_normal = normalize(mat3(u_model) * a_vNormal);
-    
+    // Shadow
     if (u_useShadow)
     {
-        vec4 temp0 = shadow0.projectionMatrix * shadow0.viewMatrix * u_model * vec4(a_position, 1);
+        vec4 temp0 = u_shadow0.projectionMatrix * u_shadow0.viewMatrix * u_model * vec4(a_position, 1);
         v_shadowPosition0 = vec3(temp0);
-    }            
+    } 
 }

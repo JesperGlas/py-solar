@@ -117,6 +117,17 @@ class Renderer:
             mesh._Material.updateRenderSettings()
             glDrawArrays(mesh._Material._Settings["drawStyle"], 0, mesh._Geometry._VertexCount)
 
-    def enableShadows(self, shadow_light, strength=0.5, resolution=(512, 512)):
+    def enableShadows(self,
+        shadow_light: Light,
+        strength=0.5,
+        resolution=(512, 512),
+        camera_bounds=[-5, 5, -5, 5, 0, 100],
+        bias=0.01
+        ):
         self._ShadowsEnabled = True
-        self._ShadowObject = Shadow(shadow_light, strength=strength, resolution=resolution)
+        self._ShadowObject = Shadow(
+            light_source=shadow_light,
+            strength=strength,
+            resolution=resolution,
+            camera_bounds=camera_bounds,
+            bias=bias )

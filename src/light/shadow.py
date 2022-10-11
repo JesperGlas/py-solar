@@ -10,7 +10,7 @@ class Shadow(object):
         strength=0.5,
         resolution=[512, 512],
         camera_bounds=[-5, 5, -5, 5, 0, 100],
-        bias=0.01
+        bias=0.1
         ) -> None:
 
         # Must be directional

@@ -1,20 +1,19 @@
 struct Light
 {
-    // 1=AMBIENT, 2=DIRECTIONAL, 3=POINT
-    int lightType;
-    // used by all light
-    vec3 color;
-    // used by directional light
-    vec3 direction;
-    // used by point light
-    vec3 position;
-    vec3 attenuation;
+    int lightType;  // 1 = AMBIENT, 2 = DIRECTIONAL, 3 = POINT
+    vec3 color;  // used by all lights
+    vec3 direction;  // used by point lights
+    vec3 position;  // used by point lights
+    vec3 attenuation;  // used by point lights
 };
 
 uniform Light u_light0;
 uniform Light u_light1;
 uniform Light u_light2;
 uniform Light u_light3;
+uniform vec3 u_viewPosition;
+uniform float u_specularStrength;
+uniform float u_shininess;
 
 vec3 lightCalc(Light light, vec3 point_position, vec3 point_normal)
 {
@@ -27,12 +26,12 @@ vec3 lightCalc(Light light, vec3 point_position, vec3 point_normal)
     if (light.lightType == 1)  // ambient light
     {
         ambient = 1;
-    }                
+    }
     else if (light.lightType == 2)  // directional light
     {
         light_direction = normalize(light.direction);
     }
-    else if (light.lightType == 3)  // point light 
+    else if (light.lightType == 3)  // point light
     {
         light_direction = normalize(point_position - light.position);
         float distance = length(light.position - point_position);
@@ -46,28 +45,16 @@ vec3 lightCalc(Light light, vec3 point_position, vec3 point_normal)
         point_normal = normalize(point_normal);
         diffuse = max(dot(point_normal, -light_direction), 0.0);
         diffuse *= attenuation;
+        if (diffuse > 0)
+        {
+            vec3 view_direction = normalize(u_viewPosition - point_position);
+            vec3 reflect_direction = reflect(light_direction, point_normal);
+            specular = max(dot(view_direction, reflect_direction), 0.0);
+            specular = u_specularStrength * pow(specular, u_shininess);
+        }
     }
     return light.color * (ambient + diffuse + specular);
 }
-
-struct Shadow
-{
-    // direction of light that casts shadow
-    vec3 lightDirection;
-    // data from camera that produces depth texture
-    mat4 projectionMatrix;
-    mat4 viewMatrix;
-    // texture that stores depth values
-    sampler2D depthTexture;
-    // regions in shadow multiplied bu (1-strength)
-    float strength;
-    // reduces unwanted visual effects
-    float bias;
-};
-
-uniform bool u_useShadow;
-uniform Shadow u_shadow0;
-in vec3 v_shadowPosition0;
 
 uniform vec3 u_color;
 uniform bool u_useTexture;
@@ -81,25 +68,45 @@ in vec2 v_texCoords;
 in vec3 v_normal;
 out vec4 fragColor;
 
+struct Shadow
+{
+    // direction of light that casts shadow
+    vec3 lightDirection;
+    // data from camera that produces depth texture
+    mat4 projectionMatrix;
+    mat4 viewMatrix;
+    // texture that stores depth values from shadow camera
+    sampler2D depthTexture;
+    // regions in shadow multiplied by (1-strength)
+    float strength;
+    // reduces unwanted visual artifacts
+    float bias;
+};
+
+uniform bool u_useShadow;
+uniform Shadow u_shadow0;
+in vec3 v_shadowPosition0;
+
 void main()
 {
     vec4 color = vec4(u_color, 1.0);
-    if (u_useTexture)
-        color *= texture2D(u_texture, v_texCoords);
-
+    if (u_useTexture) 
+    {
+        color *= texture2D( u_texture, v_texCoords );
+    }
     vec3 bump_normal = v_normal;
-    if (u_useBumpTexture)
-        bump_normal += u_bumpStrength * vec3(
-            texture2D(u_bumpTexture, v_texCoords)
-        );
+    if (u_useBumpTexture) 
+    {
+        bump_normal += u_bumpStrength * vec3(texture2D(u_bumpTexture, v_texCoords));
+    }
+    // Calculate total effect of lights on color
+    vec3 light = vec3(0, 0, 0);
+    light += lightCalc( u_light0, v_position, bump_normal );
+    light += lightCalc( u_light1, v_position, bump_normal );
+    light += lightCalc( u_light2, v_position, bump_normal );
+    light += lightCalc( u_light3, v_position, bump_normal );
+    color *= vec4(light, 1);
     
-    vec3 total = vec3(0, 0, 0);
-    total += lightCalc( u_light0, v_position, bump_normal );
-    total += lightCalc( u_light1, v_position, bump_normal );
-    total += lightCalc( u_light2, v_position, bump_normal );
-    total += lightCalc( u_light3, v_position, bump_normal );
-    color *= vec4(total, 1);
-
     if (u_useShadow)
     {
         // determine if surface is facing towards light direction
@@ -117,7 +124,7 @@ void main()
             float s = 1.0 - u_shadow0.strength;
             color *= vec4(s, s, s, 1);
         }
-    }
-
+    }  
+    
     fragColor = color;
 }

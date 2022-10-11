@@ -12,7 +12,7 @@ class LambertMaterial(Material):
         use_shadows: bool=False,
         properties: Dict={}) -> None:
 
-        vert_code, frag_code = ShaderUtils.loadShaderCode("lambert_material")
+        vert_code, frag_code = ShaderUtils.loadShaderCode("phong_material")
         super().__init__(vert_code, frag_code)
         
         # add base uniforms
