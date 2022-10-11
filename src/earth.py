@@ -75,7 +75,7 @@ class App(Base):
         # set up material
         sun_mat = SurfaceMaterial(properties={"u_color": [1, 0, 0]})
         earth_mat = LambertMaterial( texture=earth_tex, bump_texture=earth_bump, use_shadows=True )
-        moon_mat = PhongMaterial( texture=moon_tex, bump_texture=moon_bump, use_shadows=True )
+        moon_mat = LambertMaterial( texture=moon_tex, bump_texture=moon_bump, use_shadows=True )
 
         # set up meshes
         self._Sun = Mesh(sun_geo, sun_mat)
