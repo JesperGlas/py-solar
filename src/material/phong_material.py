@@ -9,6 +9,8 @@ class PhongMaterial(Material):
     def __init__(self, 
         texture: Texture=None,
         bump_texture: Texture=None,
+        specular: float=1,
+        shininess: float=32,
         use_shadows: bool=False,
         properties: Dict={}) -> None:
         
@@ -24,8 +26,8 @@ class PhongMaterial(Material):
         self.addUniform("Light", "u_light2", None)
         self.addUniform("Light", "u_light3", None)
         self.addUniform("vec3", "u_viewPosition", [0, 0, 0])
-        self.addUniform("float", "u_specularStrength", 1)
-        self.addUniform("float", "u_shininess", 32)
+        self.addUniform("float", "u_specularStrength", specular)
+        self.addUniform("float", "u_shininess", shininess)
 
         # texture uniforms
         self.addUniform("bool", "u_useTexture", 0)

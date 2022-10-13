@@ -25,7 +25,7 @@ class LambertMaterial(Material):
         self.addUniform("Light", "u_light3", None)
         self.addUniform("vec3", "u_viewPosition", [0, 0, 0])
         self.addUniform("float", "u_specularStrength", 1)
-        self.addUniform("float", "u_shininess", 32)
+        self.addUniform("float", "u_shininess", 1)
 
         # add texture uniforms
         self.addUniform("bool", "u_useTexture", 0)
