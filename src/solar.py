@@ -3,11 +3,10 @@ from pathlib import Path
 from typing import Dict
 
 # core
-from core.utils import OpenGLUtils
+from core.openGLUtils import OpenGLUtils
+from core.fileUtils import FileUtils
 from core.base import Base
 from core.renderer import Renderer
-from core.render_target import RenderTarget
-from core.object3D import Object3D
 
 # scene
 from core.scene import Scene
@@ -16,29 +15,28 @@ from core.mesh import Mesh
 
 # geometry
 from geometry.sphere_geometry import SphereGeometry
+from geometry.rectangle_geometry import RectangleGeometry
 
 # material
-from material.material import Material
-from material.surface_material import SurfaceMaterial
 from material.lambert_material import LambertMaterial
 from material.phong_material import PhongMaterial
+from material.surface_material import SurfaceMaterial
 
 # texture
 from core.texture import Texture
+from material.texture_material import TextureMaterial
 
 # extra
 from extras.movement_rig import MovementRig
+from extras.post_processor import PostProcessor
 
 # light
 from light.ambient_light import AmbientLight
 from light.directional_light import DirectionalLight
 
-# postprocessing
-from extras.post_processor import PostProcessor
-from effects.bright_filter_effect import BrightFilterEffect
-from effects.horizontal_blur_effect import HorizontalBlurEffect
-from effects.vertical_blur_effect import VerticalBlurEffect
-from effects.aditive_blend_effect import AdditiveBlendEffect
+# stellar
+from stellar.stellar_utils import StellarUtils
+from stellar.sun import Sun
 
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
@@ -48,75 +46,52 @@ class App(Base):
 
     def __init__(self, screen_size=[1280, 720], caption="App Window"):
         super().__init__(screen_size, caption)
+        self._ScreenSize = screen_size
 
         # print system information
         print(f"\nSystem information:")
         OpenGLUtils.printSystemInfo()
-
-        # set up assets path
-        self._Assets = f"{Path(__file__).resolve().parent}/assets/"
-        print(f"Assets path set to: {self._Assets}")
+        FileUtils.setProjectRoot()
 
     def initialize(self) -> None:
         self._Scene = Scene()
-        self._Camera = Camera(aspect_ratio=1280/720)
-        self._Renderer = Renderer(self._Scene, self._Camera, clear_color=True)
+        self._Camera = Camera(aspect_ratio=self._ScreenSize[0]/self._ScreenSize[1])
+        self._Renderer = Renderer(clear_color=[0, 0, 0])
+
+        # set up stellar objects
+        self._Sun = Sun()
+        self._Scene.add(self._Sun)
         
         # setup moving camera position
-        self._CameraRig = MovementRig()
+        self._CameraRig = MovementRig(units_per_sec=StellarUtils.kmToUnits(1e6))
         self._CameraRig.add(self._Camera)
-        self._CameraRig.setPosition([0, 0, 6])
+        self._CameraRig.setPosition([0, 0, StellarUtils.kmToUnits(1e6)])
         self._Scene.add(self._CameraRig)
 
+        print(f"Camer: {self._Camera.getWorldPosition()}")
+        print(f"Rig: {self._CameraRig.getWorldPosition()}")
+        print(f"Sun: {self._Sun.getWorldPosition()}")
+
         # set up light
-        sun_light = DirectionalLight(
+        self._Ambient = AmbientLight(color=[0.1, 0.1, 0.1])
+        self._Scene.add(self._Ambient)
+        self._SunLight = DirectionalLight(
             color=[0.8, 0.8, 0.8],
-            direction=[1, 1, -2] )
-        self._Scene.add(sun_light)
+            direction=[0, 0, -1] )
+        self._Scene.add(self._SunLight)
 
-        sun_ambient = AmbientLight(color=[1, 1, 1])
-
-        # set up geometry
-        sun_geo = SphereGeometry(2)
-        earth_geo = SphereGeometry()
-
-        # set up textures
-        sun_tex = Texture(f"{self._Assets}/sun.jpg")
-        earth_tex = Texture(f"{self._Assets}/earth.jpg")
-        
-        # bump maps
-        earth_bump = Texture(f"{self._Assets}/earth_bump.jpg")
-
-        # set up material
-        sun_mat = LambertMaterial( texture=sun_tex )
-        earth_mat = PhongMaterial( texture=earth_tex, bump_texture=earth_bump )
-
-        # set up meshes
-        self._Sun = Mesh(sun_geo, sun_mat)
-        self._Sun.setPosition([-2, 0, 0])
-        self._Scene.add(self._Sun)
-        self._Sun.add(sun_ambient)
-        
-        self._Earth = Mesh(earth_geo, earth_mat)
-        self._Earth.setPosition([2, 0, 0])
-        self._Scene.add(self._Earth)
-
-        # post processing
-        self._PostProcessor = PostProcessor(self._Renderer, self._Scene, self._Camera)
-        
         # scene info
         print(f"Scene info:")
         self._Scene.printNodeTree()
         
     def update(self) -> None:
-        # update data
+        # update
         self._CameraRig.update(self._Input, self._DeltaTime)
-        self._Sun.rotateX(0.002)
-        self._Earth.rotateX(0.002)
-        
-        # update uniforms
+        if self._Input.isKeyPressed("space"):
+            self._SunLight.rotateY(-0.02, False)
 
+        
         # render
-        self._PostProcessor.render()
-    
+        self._Renderer.render(self._Scene, self._Camera)    
+
 App().run()

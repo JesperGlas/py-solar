@@ -34,6 +34,8 @@ from extras.post_processor import PostProcessor
 from light.ambient_light import AmbientLight
 from light.directional_light import DirectionalLight
 
+from stellar.stellar_utils import StellarUtils as su
+
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
 AUTHOR: str = "Jesper Glas"
@@ -54,41 +56,43 @@ class App(Base):
         self._Renderer = Renderer(clear_color=[0, 0, 0])
         
         # setup moving camera position
-        self._CameraRig = MovementRig()
+        self._CameraRig = MovementRig(units_per_sec=20)
         self._CameraRig.add(self._Camera)
-        self._CameraRig.setPosition([0, 0, 8])
+        self._CameraRig.setPosition([0, 0, su.kmToUnits(50)])
         self._Scene.add(self._CameraRig)
 
+        print(su.kmToUnits(50))
+
         # set up geometry
-        sun_geo = SphereGeometry(radius=0.1)
-        earth_geo = SphereGeometry(radius=2, radius_segments=64, height_segments=32)
-        moon_geo = SphereGeometry(radius=0.5)
+        sun_geo =   SphereGeometry(radius=su.kmToUnits(696034), radius_segments=64, height_segments=32)
+        earth_geo = SphereGeometry(radius=su.kmToUnits(6371), radius_segments=64, height_segments=32)
+        moon_geo =  SphereGeometry(radius=su.kmToUnits(1737))
 
         # set up textures
+        sun_tex =   Texture(FileUtils.getAsset("sun.jpg"))
         earth_tex = Texture(FileUtils.getAsset("earth.jpg"))
-        moon_tex = Texture(FileUtils.getAsset("moon.jpg"))
+        moon_tex =  Texture(FileUtils.getAsset("moon.jpg"))
         
         # bump maps
         earth_bump = Texture(FileUtils.getAsset("earth_bump.jpg"))
         moon_bump = Texture(FileUtils.getAsset("moon_bump.jpg"))
 
         # set up material
-        sun_mat = SurfaceMaterial(properties={"u_color": [1, 0, 0]})
+        sun_mat =   LambertMaterial( texture=sun_tex )
         earth_mat = LambertMaterial( texture=earth_tex, bump_texture=earth_bump, use_shadows=True )
-        moon_mat = LambertMaterial( texture=moon_tex, bump_texture=moon_bump, use_shadows=True )
+        moon_mat =  LambertMaterial( texture=moon_tex, bump_texture=moon_bump, use_shadows=True )
 
-        # set up meshes
         self._Sun = Mesh(sun_geo, sun_mat)
-        self._Sun.setPosition([0, 0, 10])
-        #self._Scene.add(self._Sun)
+        self._Sun.setPosition([148, 0, 0])
+        self._Scene.add(self._Sun)
 
         self._Earth = Mesh(earth_geo, earth_mat)
         self._Earth.setPosition([0, 0, 0])
         self._Scene.add(self._Earth)
 
         self._Moon = Mesh(moon_geo, moon_mat)
-        self._Moon.setPosition([-3, 0, 3])
-        self._Scene.add(self._Moon)
+        self._Moon.setPosition([38.44, 0, 0])
+        self._Earth.add(self._Moon)
 
         # set up light
         self._Ambient = AmbientLight(color=[0.1, 0.1, 0.1])
@@ -96,11 +100,10 @@ class App(Base):
         self._SunLight = DirectionalLight(
             color=[0.8, 0.8, 0.8],
             direction=[0, 0, -1] )
-        self._SunLight.setPosition([0, 0, 10])
         self._Scene.add(self._SunLight)
 
         # shadows
-        self._Renderer.enableShadows( shadow_light=self._SunLight, strength=1, resolution=[1280, 720], bias=1 )
+        self._Renderer.enableShadows( shadow_light=self._SunLight, strength=1, resolution=[1280, 720], bias=0.01 )
 
         # post processing
         
