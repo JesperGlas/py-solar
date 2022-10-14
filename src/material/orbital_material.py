@@ -1,22 +1,24 @@
 from typing import Dict
 from OpenGL.GL import *
+from core.fileUtils import FileUtils
 from shaders.shaderUtils import ShaderUtils
 from material.material import Material
 from core.texture import Texture
-from light.ambient_light import AmbientLight
-from light.directional_light import DirectionalLight
-from core.object3D import Object3D
 
-class PlanetMaterial(Material):
+class OrbitalMaterial(Material):
 
     def __init__(self,
-        texture: Texture=None,
-        bump_texture: Texture=None,
+        texture_name: str=None,
+        bumpmap_name: str=None,
         custom_shader: str = None,
+        use_shadows: bool=False,
         properties: Dict={}) -> None:
 
+        texture = Texture(FileUtils.getAsset(texture_name))
+        bump_texture = Texture(FileUtils.getAsset(bumpmap_name))
+
         if custom_shader == None:
-            vert_code, frag_code = ShaderUtils.loadShaderCode("planet_material")
+            vert_code, frag_code = ShaderUtils.loadShaderCode("orbital_shader")
         else:
             vert_code, frag_code = ShaderUtils.loadShaderCode(custom_shader)
 
@@ -32,6 +34,20 @@ class PlanetMaterial(Material):
         self.addUniform("vec3", "u_viewPosition", [0, 0, 0])
         self.addUniform("float", "u_specularStrength", 1)
         self.addUniform("float", "u_shininess", 1)
+
+        # add shadow uniforms
+        self.addUniform("bool", "u_useShadows", 0)
+        if use_shadows:
+            self.addUniform("bool", "u_useShadows", True)
+            self.addUniform("vec3", "u_sunPosition", [0, 0, 0])
+            self.addUniform("vec3", "u_moonPosition", [0, 0, 0])
+            self.addUniform("float", "u_sunRadius", 0)
+            self.addUniform("float", "u_moonRadius", 0)
+
+        self.addUniform("vec3", "u_sunPosition", [0, 0, 0])
+        self.addUniform("float", "u_sunRadius", 1.0)
+        self.addUniform("vec3", "u_moonPosition", [0, 0, 0])
+        self.addUniform("float", "u_moonRadius", 1.0)
 
         # add texture uniforms
         self.addUniform("bool", "u_useTexture", 0)

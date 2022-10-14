@@ -19,7 +19,7 @@ from geometry.sphere_geometry import SphereGeometry
 
 # material
 from material.sun_material import SunMaterial
-from material.earth_material import EarthMaterial
+from material.orbital_material import OrbitalMaterial
 
 # light
 from light.directional_light import DirectionalLight
@@ -55,10 +55,23 @@ class App(Base):
         self._MainScene.add(self._Sun)
 
         earth_geo = SphereGeometry(radius_segments=64, height_segments=32)
-        earth_mat = EarthMaterial()
+        earth_mat = OrbitalMaterial(
+            texture_name="earth.jpg",
+            bumpmap_name="earth_bump.jpg"
+        )
         self._Earth = Mesh(earth_geo, earth_mat)
-        self._Earth.setPosition([10, 0, 0])
         self._Sun.add(self._Earth)
+        self._Earth.setPosition([10, 0, 0])
+
+        moon_geo = SphereGeometry(radius=0.5)
+        moon_mat = OrbitalMaterial(
+            texture_name="moon.jpg",
+            bumpmap_name="moon_bump.jpg",
+            use_shadows=True
+        )
+        self._Moon = Mesh(moon_geo, moon_mat)
+        self._Earth.add(self._Moon)
+        self._Moon.setPosition([0, 0, 4])
 
         # setup moving camera position
         self._CameraRig = MovementRig(units_per_sec=10)
@@ -85,6 +98,18 @@ class App(Base):
         self._Earth.rotateY(0.001, False)
         self._Earth._Material.setProperties(properties={
             "u_lightDirection": self._Earth.getWorldPosition()
+        })
+
+        # update moon
+        moon_rotation_speed = 0.001
+        self._Moon.rotateY(moon_rotation_speed)
+        self._Moon.rotateY(0.001, False)
+        self._Moon._Material.setProperties(properties={
+            "u_lightDirection": self._Moon.getWorldPosition(),
+            "u_sunPosition": [0, 0, 0],
+            "u_sunRadius": 1,
+            "u_moonPosition": self._Earth.getWorldPosition(),
+            "u_moonRadius": 0.5
         })
 
         # update uniforms
