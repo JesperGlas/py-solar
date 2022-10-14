@@ -1,9 +1,11 @@
 uniform mat4 u_proj;
 uniform mat4 u_view;
 uniform mat4 u_model;
+
 in vec3 a_position;
 in vec2 a_texCoords;
 in vec3 a_vNormal;
+
 out vec3 v_position;
 out vec2 v_texCoords;
 out vec3 v_normal;

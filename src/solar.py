@@ -49,7 +49,7 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=1280/720)
         self._Renderer = Renderer(clear_color=[0, 0, 0])
 
-        sun_geo = SphereGeometry(radius_segments=64, height_segments=32)
+        sun_geo = SphereGeometry(radius_segments=128, height_segments=64)
         sun_mat = SunMaterial()
         self._Sun = Mesh(sun_geo, sun_mat)
         self._MainScene.add(self._Sun)
