@@ -81,6 +81,12 @@ class Object3D(object):
         self._Transform.itemset((1, 3), position[1])
         self._Transform.itemset((2, 3), position[2])
 
+    def getDirectionTowards(self, target_position):
+        return Matrix.makeLookAt(self.getWorldPosition(), target_position)
+
+    def getDirectionTowardsObject(self, target: object):
+        return self.getDirectionTowards(target.getWorldPosition())
+
     def lookAt(self, target_position):
         self._Transform = Matrix.makeLookAt(
             self.getWorldPosition(),

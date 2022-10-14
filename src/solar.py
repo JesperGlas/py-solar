@@ -16,28 +16,16 @@ from core.mesh import Mesh
 
 # geometry
 from geometry.sphere_geometry import SphereGeometry
-from geometry.rectangle_geometry import RectangleGeometry
 
 # material
-from material.lambert_material import LambertMaterial
 from material.sun_material import SunMaterial
+from material.earth_material import EarthMaterial
 
-# texture
-from core.texture import Texture
-from material.texture_material import TextureMaterial
+# light
+from light.directional_light import DirectionalLight
 
 # extra
 from extras.movement_rig import MovementRig
-from extras.post_processor import PostProcessor
-
-# effects
-from effects.horizontal_blur_effect import HorizontalBlurEffect
-from effects.vertical_blur_effect import VerticalBlurEffect
-from effects.aditive_blend_effect import AdditiveBlendEffect
-
-# light
-from light.ambient_light import AmbientLight
-from light.directional_light import DirectionalLight
 
 
 TITLE: str = "Solarpy"
@@ -61,17 +49,23 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=1280/720)
         self._Renderer = Renderer(clear_color=[0, 0, 0])
 
-        # setup moving camera position
-        self._CameraRig = MovementRig()
-        self._CameraRig.add(self._Camera)
-        self._CameraRig.setDirection([0, 0, -1])
-        self._CameraRig.setPosition([0, 0, 4])
-        self._MainScene.add(self._CameraRig)
-
         sun_geo = SphereGeometry(radius_segments=64, height_segments=32)
         sun_mat = SunMaterial()
         self._Sun = Mesh(sun_geo, sun_mat)
         self._MainScene.add(self._Sun)
+
+        earth_geo = SphereGeometry(radius_segments=64, height_segments=32)
+        earth_mat = EarthMaterial()
+        self._Earth = Mesh(earth_geo, earth_mat)
+        self._Earth.setPosition([10, 0, 0])
+        self._Sun.add(self._Earth)
+
+        # setup moving camera position
+        self._CameraRig = MovementRig(units_per_sec=10)
+        self._CameraRig.add(self._Camera)
+        self._CameraRig.setDirection([0, 0, -1])
+        self._CameraRig.setPosition([0, 0, 4])
+        self._Earth.add(self._CameraRig)
 
         # scene info
         print(f"Scene info:")
@@ -80,7 +74,18 @@ class App(Base):
     def update(self) -> None:
         # update data
         self._CameraRig.update(self._Input, self._DeltaTime)
+        
+        # update sun
         self._Sun.rotateY(0.001)
+
+        # update earth
+        earth_rotation_speed = 0.001
+        self._Earth.rotateY(earth_rotation_speed)
+        self._CameraRig.rotateY(-earth_rotation_speed, False) # compensate for earth rotation
+        self._Earth.rotateY(0.001, False)
+        self._Earth._Material.setProperties(properties={
+            "u_lightDirection": self._Earth.getWorldPosition()
+        })
 
         # update uniforms
         self._Sun._Material.setProperties(properties={
