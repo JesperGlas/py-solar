@@ -1,16 +1,19 @@
 from shaders.shaderUtils import ShaderUtils
+from core.fileUtils import FileUtils
 from typing import Dict
 from OpenGL.GL import *
 from material.material import Material
 from core.texture import Texture
 
-class TextureMaterial(Material):
+class SunMaterial(Material):
     
-    def __init__(self, texture: Texture, properties: Dict={}) -> None:
+    def __init__(self, properties: Dict={}) -> None:
 
-        vert_code, frag_code = ShaderUtils.loadShaderCode("texture_shader")
+        vert_code, frag_code = ShaderUtils.loadShaderCode("sun_material")
 
         super().__init__(vert_code, frag_code)
+
+        texture = Texture(FileUtils.getAsset("sun.jpg"))
 
         self.addUniform("vec3", "u_color", [1.0, 1.0, 1.0])
         self.addUniform("sampler2D", "u_texture", [texture._TextureRef, 1])

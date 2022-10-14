@@ -15,7 +15,7 @@ class Renderer:
         # required for antialiasing
         glEnable(GL_MULTISAMPLE)
         glClearColor(*clear_color, 1)
-        self._window_size = pg.display.get_surface().get_size()
+        self._WindowSize = pg.display.get_surface().get_size()
         self._ShadowsEnabled = False
 
     def render(self, scene: Scene, camera: Camera, clear_color=True, clear_depth=True, render_target=None):
@@ -62,10 +62,10 @@ class Renderer:
             # set render target to window
             # (the value 0 is indicating the framebuffer attached to the window)
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
-            glViewport(0, 0, *self._window_size)
+            glViewport(0, 0, *self._WindowSize)
         else:
             # set render target properties
-            glBindFramebuffer(GL_FRAMEBUFFER, render_target._FrameBufferRef)
+            glBindFramebuffer(GL_FRAMEBUFFER, render_target._FramebufferRef)
             glViewport(0, 0, render_target._Width, render_target._Height)
 
         # clear color and depth buffers
