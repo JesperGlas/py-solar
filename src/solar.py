@@ -68,7 +68,7 @@ class App(Base):
         self._CameraRig.setPosition([0, 0, 4])
         self._MainScene.add(self._CameraRig)
 
-        sun_geo = SphereGeometry()
+        sun_geo = SphereGeometry(radius_segments=64, height_segments=32)
         sun_mat = SunMaterial()
         self._Sun = Mesh(sun_geo, sun_mat)
         self._MainScene.add(self._Sun)
@@ -80,7 +80,11 @@ class App(Base):
     def update(self) -> None:
         # update data
         self._CameraRig.update(self._Input, self._DeltaTime)
-        self._Sun.rotateY(-0.002)
+        self._Sun.rotateY(0.001)
+
+        # update uniforms
+        self._Sun._Material.setProperties(properties={
+            "u_time": self._ElapsedTime })
 
         # render
         self._Renderer.render(self._MainScene, self._Camera)

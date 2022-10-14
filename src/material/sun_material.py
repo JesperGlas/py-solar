@@ -14,11 +14,12 @@ class SunMaterial(Material):
         super().__init__(vert_code, frag_code)
 
         texture = Texture(FileUtils.getAsset("sun.jpg"))
+        noise = Texture(FileUtils.getAsset("swirl.jpg"))
 
         self.addUniform("vec3", "u_color", [1.0, 1.0, 1.0])
         self.addUniform("sampler2D", "u_texture", [texture._TextureRef, 1])
-        self.addUniform("vec2", "u_texRepeat", [1.0, 1.0])
-        self.addUniform("vec2", "u_texOffset", [0.0, 0.0])
+        self.addUniform("sampler2D", "u_noise", [noise._TextureRef, 2])
+        self.addUniform("float", "u_time", 0)
         self.locateUniforms()
 
         # render both sides?
