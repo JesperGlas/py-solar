@@ -4,7 +4,7 @@ from numpy.linalg import inv
 
 class Camera(Object3D):
 
-    def __init__(self, angle_of_view=60, aspect_ratio=1, near=0.1, far=1000) -> None:
+    def __init__(self, angle_of_view=60, aspect_ratio=1, near=0.001, far=1000) -> None:
         super().__init__()
         
         self._ProjectionMatrix = Matrix.makePerspective(angle_of_view, aspect_ratio, near, far)

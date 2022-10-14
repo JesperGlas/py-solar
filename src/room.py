@@ -16,6 +16,7 @@ from core.mesh import Mesh
 # geometry
 from geometry.sphere_geometry import SphereGeometry
 from geometry.rectangle_geometry import RectangleGeometry
+from geometry.box_geometry import BoxGeometry
 
 # material
 from material.lambert_material import LambertMaterial
@@ -36,7 +37,6 @@ from light.directional_light import DirectionalLight
 
 # stellar
 from stellar.stellar_utils import StellarUtils
-from stellar.sun import Sun
 
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
@@ -58,27 +58,50 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=self._ScreenSize[0]/self._ScreenSize[1])
         self._Renderer = Renderer(clear_color=[0, 0, 0])
 
-        # set up stellar objects
-        self._Sun = Sun()
-        self._Scene.add(self._Sun)
+        # setup room
+        wall_geo = RectangleGeometry(20, 20)
+        wall_mat = PhongMaterial(shininess=1, use_shadows=True, properties={
+            "u_color": [0.8, 0.8, 0.8]
+        })
+
+        self._Floor = Mesh(wall_geo, wall_mat)
+        self._Floor.setPosition([0, -10, 0])
+        self._Floor.rotateX(-pi/2)
+        self._Scene.add(self._Floor)
+
+        self._rWall = Mesh(wall_geo, wall_mat)
+        self._rWall.setPosition([-10, 0, 0])
+        self._rWall.rotateY(pi/2)
+        self._Scene.add(self._rWall)
+
+        self._lWall = Mesh(wall_geo, wall_mat)
+        self._lWall.setPosition([0, 0, -10])
+        self._Scene.add(self._lWall)
+
+        # set up objects
+        sphere_geo = SphereGeometry()
+        sphere_mat = PhongMaterial(use_shadows=True)
+        self._Sphere1 = Mesh(sphere_geo, sphere_mat)
+        self._Scene.add(self._Sphere1)
+        self._Sphere2 = Mesh(sphere_geo, sphere_mat)
+        self._Sphere2.setPosition([-3, -3, 0])
+        self._Scene.add(self._Sphere2)
         
         # setup moving camera position
-        self._CameraRig = MovementRig(units_per_sec=StellarUtils.kmToUnits(1e6))
+        self._CameraRig = MovementRig()
         self._CameraRig.add(self._Camera)
-        self._CameraRig.setPosition([0, 0, StellarUtils.kmToUnits(1e6)])
+        self._CameraRig.setPosition([5, 5, 15])
+        self._CameraRig.setDirection([-0.5, -0.5, -1])
         self._Scene.add(self._CameraRig)
 
-        print(f"Camer: {self._Camera.getWorldPosition()}")
-        print(f"Rig: {self._CameraRig.getWorldPosition()}")
-        print(f"Sun: {self._Sun.getWorldPosition()}")
-
         # set up light
-        self._Ambient = AmbientLight(color=[0.1, 0.1, 0.1])
+        self._Ambient = AmbientLight(color=[0.2, 0.2, 0.2])
         self._Scene.add(self._Ambient)
-        self._SunLight = DirectionalLight(
-            color=[0.8, 0.8, 0.8],
-            direction=[0, 0, -1] )
-        self._Scene.add(self._SunLight)
+        self._Directional = DirectionalLight()
+        self._Directional.setDirection([-0.3, -0.3, 0])
+        self._Scene.add(self._Directional)
+
+        self._Renderer.enableShadows(self._Directional)
 
         # scene info
         print(f"Scene info:")
@@ -88,7 +111,7 @@ class App(Base):
         # update
         self._CameraRig.update(self._Input, self._DeltaTime)
         if self._Input.isKeyPressed("space"):
-            self._SunLight.rotateY(-0.02, False)
+            self._Directional.rotateY(-0.02, False)
 
         
         # render
