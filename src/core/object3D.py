@@ -20,6 +20,12 @@ class Object3D(object):
         self._Children.remove(child)
         child._Parent = None
 
+    def getRoot(self) -> object:
+        current = self._Parent
+        while current._Parent != None:
+            current = current._Parent
+        return current
+
     def getWorldMatrix(self) -> Matrix:
         if self._Parent == None:
             return self._Transform
@@ -91,6 +97,12 @@ class Object3D(object):
         self._Transform = Matrix.makeLookAt(
             self.getWorldPosition(),
             target_position )
+
+    def lookAtObject(self, target: object, local_coord: bool=True) -> None:
+        if local_coord:
+            self.lookAt(target.getPosition())
+        else:
+            self.lookAt(target.getWorldPosition())
 
     def getOrientationMatrix(self):
         return np.array([
