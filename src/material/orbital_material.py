@@ -14,9 +14,6 @@ class OrbitalMaterial(Material):
         use_shadows: bool=False,
         properties: Dict={}) -> None:
 
-        texture = Texture(FileUtils.getAsset(texture_name))
-        bump_texture = Texture(FileUtils.getAsset(bumpmap_name))
-
         if custom_shader == None:
             vert_code, frag_code = ShaderUtils.loadShaderCode("orbital_shader")
         else:
@@ -27,40 +24,26 @@ class OrbitalMaterial(Material):
         # add base uniforms
         self.addUniform("vec3", "u_color", [1.0, 1.0, 1.0])
 
-        # add light uniforms
-        self.addUniform("vec3", "u_ambientColor", [0.4, 0.4, 0.4])
-        self.addUniform("vec3", "u_lightColor", [0.6, 0.6, 0.6])
-        self.addUniform("vec3", "u_lightDirection", [-1, 0, 0])
+        # light uniforms
+        self.addUniform("Light", "u_light", None)
         self.addUniform("vec3", "u_viewPosition", [0, 0, 0])
-        self.addUniform("float", "u_specularStrength", 1)
-        self.addUniform("float", "u_shininess", 1)
-
+        
         # add shadow uniforms
-        self.addUniform("bool", "u_useShadows", 0)
-        if use_shadows:
-            self.addUniform("bool", "u_useShadows", True)
-            self.addUniform("vec3", "u_sunPosition", [0, 0, 0])
-            self.addUniform("vec3", "u_moonPosition", [0, 0, 0])
-            self.addUniform("float", "u_sunRadius", 0)
-            self.addUniform("float", "u_moonRadius", 0)
-
-        self.addUniform("vec3", "u_sunPosition", [0, 0, 0])
-        self.addUniform("float", "u_sunRadius", 1.0)
-        self.addUniform("vec3", "u_moonPosition", [0, 0, 0])
-        self.addUniform("float", "u_moonRadius", 1.0)
 
         # add texture uniforms
         self.addUniform("bool", "u_useTexture", 0)
-        if texture == None:
+        if texture_name == None:
             self.addUniform("bool", "u_useTexture", False)
         else:
+            texture = Texture(FileUtils.getAsset(texture_name))
             self.addUniform("bool", "u_useTexture", True)
             self.addUniform("sampler2D", "u_texture", [texture._TextureRef, 1])
 
         # add bumpmap uniforms
-        if bump_texture == None:
+        if bumpmap_name == None:
             self.addUniform("bool", "u_useBumpTexture", False)
         else:
+            bump_texture = Texture(FileUtils.getAsset(bumpmap_name))
             self.addUniform("bool", "u_useBumpTexture", True)
             self.addUniform("sampler2D", "u_bumpTexture", [bump_texture._TextureRef, 2])
             self.addUniform("float", "u_bumpStrength", 1.0)

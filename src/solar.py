@@ -22,10 +22,12 @@ from material.sun_material import SunMaterial
 from material.orbital_material import OrbitalMaterial
 
 # light
-from light.directional_light import DirectionalLight
+from light.light import Light
 
 # extra
 from extras.movement_rig import MovementRig
+from stellar.stellar_utils import StellarUtils as SU
+from stellar.planets.earth import Earth
 
 
 TITLE: str = "Solarpy"
@@ -49,37 +51,38 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=1280/720)
         self._Renderer = Renderer(clear_color=[0, 0, 0])
 
-        sun_geo = SphereGeometry(radius=10, radius_segments=128, height_segments=64)
+        print(f"Sun radius: {SU.getSunRadius()}")
+        print(f"Moon radius: {SU.getMoonRadius()}")
+
+        sun_geo = SphereGeometry(radius=SU.getSunRadius(), radius_segments=128, height_segments=64)
         sun_mat = SunMaterial()
         self._Sun = Mesh(sun_geo, sun_mat)
         self._MainScene.add(self._Sun)
 
-        earth_geo = SphereGeometry(radius_segments=64, height_segments=32)
-        earth_mat = OrbitalMaterial(
-            texture_name="earth.jpg",
-            bumpmap_name="earth_bump.jpg",
-            use_shadows=True
-        )
-        self._Earth = Mesh(earth_geo, earth_mat)
+        self._Earth = Earth()
         self._Sun.add(self._Earth)
-        self._Earth.setPosition([20, 0, 0])
+        self._Earth.setPosition([0, 0, SU.getEarthSunDistance()])
 
-        moon_geo = SphereGeometry(radius=0.5)
+        moon_geo = SphereGeometry(radius=SU.getMoonRadius(), radius_segments=64, height_segments=32)
         moon_mat = OrbitalMaterial(
             texture_name="moon.jpg",
-            bumpmap_name="moon_bump.jpg",
             use_shadows=True
         )
         self._Moon = Mesh(moon_geo, moon_mat)
         self._Earth.add(self._Moon)
-        self._Moon.setPosition([0, 0, -4])
+        self._Moon.setPosition([SU.getMoonEarthDistance(), 0, 0])
 
         # setup moving camera position
-        self._CameraRig = MovementRig(units_per_sec=10)
+        self._CameraRig = MovementRig(units_per_sec=0.5)
         self._CameraRig.add(self._Camera)
         self._CameraRig.setDirection([0, 0, -1])
         self._CameraRig.setPosition([0, 0, 10])
         self._Earth.add(self._CameraRig)
+
+        # setup light
+        self._Light = Light()
+        self._Light.setPosition([0, 0, 0])
+        self._MainScene.add(self._Light)
 
         # scene info
         print(f"Scene info:")
@@ -89,42 +92,25 @@ class App(Base):
         # update data
         self._CameraRig.update(self._Input, self._DeltaTime)
         if self._Input.isKeyDown("1"):
-            self._CameraRig.attach(self._Sun, distance=20)
+            self._CameraRig.attach(self._Sun, distance=SU.getSunRadius()*2)
             self._MainScene.printNodeTree()
         if self._Input.isKeyDown("2"):
-            self._CameraRig.attach(self._Earth)
+            self._CameraRig.attach(self._Earth, distance=SU.getEarthRadius()*2)
             self._MainScene.printNodeTree()
         if self._Input.isKeyDown("3"):
-            self._CameraRig.attach(self._Moon, distance=2)
+            self._CameraRig.attach(self._Moon, distance=SU.getMoonRadius()*2)
             self._MainScene.printNodeTree()
         
         # update sun
         self._Sun.rotateY(0.001)
 
         # update earth
-        earth_rotation_speed = 0.001
+        earth_rotation_speed = 0.0001
         self._Earth.rotateY(earth_rotation_speed)
-        self._CameraRig.rotateY(-earth_rotation_speed, False) # compensate for earth rotation
-        self._Earth.rotateY(0.001, False)
-        self._Earth._Material.setProperties(properties={
-            "u_lightDirection": self._Earth.getWorldPosition(),
-            "u_sunPosition": [0, 0, 0],
-            "u_sunRadius": 2,
-            "u_moonPosition": self._Moon.getWorldPosition(),
-            "u_moonRadius": 0.5
-        })
 
         # update moon
-        moon_rotation_speed = 0.001
+        moon_rotation_speed = 0.0001
         self._Moon.rotateY(moon_rotation_speed)
-        self._Moon.rotateY(0.001, False)
-        self._Moon._Material.setProperties(properties={
-            "u_lightDirection": self._Moon.getWorldPosition(),
-            "u_sunPosition": [0, 0, 0],
-            "u_sunRadius": 2,
-            "u_moonPosition": self._Earth.getWorldPosition(),
-            "u_moonRadius": 0.5
-        })
 
         # update uniforms
         self._Sun._Material.setProperties(properties={

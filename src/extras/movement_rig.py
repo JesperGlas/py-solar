@@ -34,6 +34,9 @@ class MovementRig(Object3D):
      def remove(self, child: Object3D) -> None:
           self._LookAttachment.remove(child)
 
+     def setMoveSpeed(self, units_per_second: float) -> None:
+          self._UnitsPerSecond = units_per_second
+
      def update(self, input_object: Input, delta_time) -> None:
           move_amount     = self._UnitsPerSecond * delta_time
           rotate_amount   = self._DegreesPerSecond * (pi / 180) * delta_time
@@ -43,13 +46,17 @@ class MovementRig(Object3D):
           if input_object.isKeyPressed(self. KEY_MOVE_BACKWARDS):
                self.translate( 0, 0, move_amount ) 
           if input_object.isKeyPressed(self.KEY_MOVE_LEFT):
-               self.translate( -move_amount, 0, 0 ) 
+               #self.translate( -move_amount, 0, 0 )
+               self.rotateY(-rotate_amount, False)
           if input_object.isKeyPressed(self.KEY_MOVE_RIGHT):
-               self.translate( move_amount, 0, 0 ) 
+               #self.translate( move_amount, 0, 0 ) 
+               self.rotateY(rotate_amount, False)
           if input_object.isKeyPressed(self.KEY_MOVE_UP):
-               self.translate( 0, move_amount, 0 ) 
+               #self.translate( 0, move_amount, 0 )
+               self.rotateX(rotate_amount, False)
           if input_object.isKeyPressed(self.KEY_MOVE_DOWN):
-               self.translate( 0, -move_amount, 0 ) 
+               #self.translate( 0, -move_amount, 0 ) 
+               self.rotateX(-rotate_amount, False)
           if input_object.isKeyPressed(self.KEY_TURN_RIGHT):
                self.rotateY( -rotate_amount ) 
           if input_object.isKeyPressed(self.KEY_TURN_LEFT):
@@ -68,4 +75,3 @@ class MovementRig(Object3D):
                self.detach()
           target.add(self)
           self.setPosition([0, 0, distance])
-          self.setDirection([0, 0, -1])

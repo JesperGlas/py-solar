@@ -13,9 +13,7 @@ out vec3 v_normal;
 
 void main()
 {
-    float magnitude = 0.0;
-    vec3 displacement = a_vNormal * texture2D(u_bumpTexture, a_texCoords).r * magnitude;
-    gl_Position = u_proj * u_view * u_model * vec4(a_position + displacement, 1);
+    gl_Position = u_proj * u_view * u_model * vec4(a_position, 1);
     v_position = vec3(u_view * vec4(a_position, 1));
     v_texCoords = a_texCoords;
     v_normal = normalize(mat3(u_model) * a_vNormal);

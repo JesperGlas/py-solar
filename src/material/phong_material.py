@@ -21,13 +21,8 @@ class PhongMaterial(Material):
         self.addUniform("vec3", "u_color", [1.0, 1.0, 1.0])
 
         # light uniforms
-        self.addUniform("Light", "u_light0", None)
-        self.addUniform("Light", "u_light1", None)
-        self.addUniform("Light", "u_light2", None)
-        self.addUniform("Light", "u_light3", None)
+        self.addUniform("Light", "u_light", None)
         self.addUniform("vec3", "u_viewPosition", [0, 0, 0])
-        self.addUniform("float", "u_specularStrength", specular)
-        self.addUniform("float", "u_shininess", shininess)
 
         # texture uniforms
         self.addUniform("bool", "u_useTexture", 0)
@@ -46,11 +41,6 @@ class PhongMaterial(Material):
             self.addUniform("float", "u_bumpStrength", 1.0)
 
         # add shadow uniforms
-        if not use_shadows:
-            self.addUniform("bool", "u_useShadow", False)
-        else:
-            self.addUniform("bool", "u_useShadow", True)
-            self.addUniform("Shadow", "u_shadow0", None)
 
         self.locateUniforms()
 

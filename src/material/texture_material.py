@@ -1,14 +1,18 @@
 from shaders.shaderUtils import ShaderUtils
 from typing import Dict
 from OpenGL.GL import *
+from shaders.shaderUtils import ShaderUtils
 from material.material import Material
 from core.texture import Texture
 
 class TextureMaterial(Material):
     
-    def __init__(self, texture: Texture, properties: Dict={}) -> None:
+    def __init__(self, texture: Texture, custom_shader_name: str=None, properties: Dict={}) -> None:
 
-        vert_code, frag_code = ShaderUtils.loadShaderCode("texture_shader")
+        if custom_shader_name:
+            vert_code, frag_code = ShaderUtils.loadShaderCode(custom_shader_name)
+        else:
+            vert_code, frag_code = ShaderUtils.loadShaderCode("texture_shader")
 
         super().__init__(vert_code, frag_code)
 

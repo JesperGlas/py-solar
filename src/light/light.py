@@ -2,12 +2,10 @@ from core.object3D import Object3D
 
 class Light(Object3D):
 
-    AMBIENT = 1
-    DIRECTIONAL = 2
-    POINT = 3
-    def __init__(self, light_type=0) -> None:
+    def __init__(self) -> None:
         super().__init__()
 
-        self._LightType     = light_type
-        self._LightColor    = [1, 1, 1]
-        self._Attenuation   = [1, 0, 0]
+        self._Ambient =     [0.2, 0.2, 0.2]
+        self._Color =       [1, 1, 1]
+        self._Direction =   [0, 0, 1]
+        self._Position =    [0, 0, 0]

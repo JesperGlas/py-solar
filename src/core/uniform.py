@@ -16,20 +16,10 @@ class Uniform(object):
         """ Get and store reference for program variable with given name """
         if self._DataType == 'Light':
             self._VariableRef = {
-                "lightType":    glGetUniformLocation(program_ref, f"{variable_name}.lightType"),
+                "ambient":      glGetUniformLocation(program_ref, f"{variable_name}.ambient"),
                 "color":        glGetUniformLocation(program_ref, f"{variable_name}.color"),
                 "direction":    glGetUniformLocation(program_ref, f"{variable_name}.direction"),
                 "position":     glGetUniformLocation(program_ref, f"{variable_name}.position"),
-                "attenuation":  glGetUniformLocation(program_ref, f"{variable_name}.attenuation"),
-            }
-        elif self._DataType == "Shadow":
-            self._VariableRef = {
-                "lightDirection":   glGetUniformLocation(program_ref, f"{variable_name}.lightDirection"),
-                "projectionMatrix": glGetUniformLocation(program_ref, f"{variable_name}.projectionMatrix"),
-                "viewMatrix":       glGetUniformLocation(program_ref, f"{variable_name}.viewMatrix"),
-                "depthTexture":     glGetUniformLocation(program_ref, f"{variable_name}.depthTexture"),
-                "strength":         glGetUniformLocation(program_ref, f"{variable_name}.strength"),
-                "bias":             glGetUniformLocation(program_ref, f"{variable_name}.bias"),
             }
         else:
             self._VariableRef = glGetUniformLocation(program_ref, variable_name)
@@ -62,23 +52,7 @@ class Uniform(object):
                 glUniform1i(self._VariableRef, texture_unit_ref)
             elif self._DataType == "Light":
                 self._Data: Light
-                glUniform1i(self._VariableRef["lightType"],     self._Data._LightType)
-                glUniform3f(self._VariableRef["color"],         *self._Data._LightColor)
+                glUniform3f(self._VariableRef["ambient"],       *self._Data._Ambient)
+                glUniform3f(self._VariableRef["color"],         *self._Data._Color)
                 glUniform3f(self._VariableRef["direction"],     *self._Data.getDirection())
                 glUniform3f(self._VariableRef["position"],      *self._Data.getPosition())
-                glUniform3f(self._VariableRef["attenuation"],   *self._Data._Attenuation)
-            elif self._DataType == "Shadow":
-                glUniform3f(self._VariableRef["lightDirection"],
-                    *self._Data._LightSource.getDirection())
-                glUniformMatrix4fv(self._VariableRef["projectionMatrix"],
-                    1, GL_TRUE, self._Data._Camera._ProjectionMatrix)
-                glUniformMatrix4fv(self._VariableRef["viewMatrix"],
-                    1, GL_TRUE, self._Data._Camera._ViewMatrix)
-                # Configure depth texture
-                texture_object_ref = self._Data._RenderTarget._Texture._TextureRef
-                texture_unit_ref = 15
-                glActiveTexture(GL_TEXTURE0 + texture_unit_ref)
-                glBindTexture(GL_TEXTURE_2D, texture_object_ref)
-                glUniform1i(self._VariableRef["depthTexture"], texture_unit_ref)
-                glUniform1f(self._VariableRef["strength"], self._Data._Strength)
-                glUniform1f(self._VariableRef["bias"], self._Data._Bias)
