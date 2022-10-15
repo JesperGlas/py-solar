@@ -116,6 +116,9 @@ class App(Base):
         self._Sun._Material.setProperties(properties={
             "u_time": self._ElapsedTime })
 
+        self._Earth._Material.setProperties(properties={
+            "u_time": self._ElapsedTime })
+
         # render
         self._Renderer.render(self._MainScene, self._Camera)
     

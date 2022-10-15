@@ -17,6 +17,9 @@ void main()
     float noise_offset = clamp(sin(u_time*noise_magnitude) * texture2D(u_noise, v_texCoords).r, -1, 1);
     
     color *= texture2D( u_texture, v_texCoords + noise_offset ) + vec4(0.1);
+
+    // add transparent overlay
+    float magnitude = 0.1;
     
     fragColor = color;
 }

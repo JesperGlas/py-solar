@@ -10,6 +10,7 @@ class OrbitalMaterial(Material):
     def __init__(self,
         texture_name: str=None,
         bumpmap_name: str=None,
+        atmosphere_name: str=None,
         custom_shader: str = None,
         use_shadows: bool=False,
         properties: Dict={}) -> None:
@@ -23,6 +24,7 @@ class OrbitalMaterial(Material):
         
         # add base uniforms
         self.addUniform("vec3", "u_color", [1.0, 1.0, 1.0])
+        self.addUniform("float", "u_time", 0)
 
         # light uniforms
         self.addUniform("Light", "u_light", None)
@@ -47,6 +49,14 @@ class OrbitalMaterial(Material):
             self.addUniform("bool", "u_useBumpTexture", True)
             self.addUniform("sampler2D", "u_bumpTexture", [bump_texture._TextureRef, 2])
             self.addUniform("float", "u_bumpStrength", 1.0)
+
+        # atmospheric effect
+        if atmosphere_name == None:
+            self.addUniform("bool", "u_useAtmosphere", False)
+        else:
+            atmosphere_texture = Texture(FileUtils.getAsset(atmosphere_name))
+            self.addUniform("bool", "u_useAtmosphere", True)
+            self.addUniform("sampler2D", "u_atmosphereTexture", [atmosphere_texture._TextureRef, 3])
 
         self.locateUniforms()
 

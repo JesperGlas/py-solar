@@ -15,5 +15,6 @@ class Earth(Mesh):
         mat = OrbitalMaterial(
             texture_name="earth.jpg",
             bumpmap_name="earth_bump.jpg",
+            atmosphere_name="earth_clouds.jpg",
             use_shadows=True )
         super().__init__(geo, mat)
