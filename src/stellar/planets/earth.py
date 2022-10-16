@@ -8,9 +8,11 @@ from core.mesh import Mesh
 
 class Earth(Mesh):
 
-    def __init__(self) -> None:
+    def __init__(self, custom_radius=None) -> None:
 
         earth_radius = SU.getEarthRadius()
+        if custom_radius != None:
+            earth_radius = custom_radius
         geo = SphereGeometry(radius=earth_radius, radius_segments=128, height_segments=64)
         mat = OrbitalMaterial(
             texture_name="earth.jpg",

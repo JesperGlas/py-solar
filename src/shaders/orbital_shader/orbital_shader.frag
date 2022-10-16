@@ -2,7 +2,6 @@ struct Light
 {
     vec3 ambient;
     vec3 color;
-    vec3 direction;
     vec3 position;
 };
 
@@ -34,19 +33,9 @@ uniform bool u_useAtmosphere;
 uniform sampler2D u_atmosphereTexture;
 uniform float u_time;
 
-vec2 rotateUV(vec2 tex_coords, vec2 pivot, float rotation)
-{
-    float cosa = cos(rotation);
-    float sina = sin(rotation);
-    tex_coords -= pivot;
-    return vec2(
-        cosa * tex_coords.x - sina * tex_coords.y,
-        cosa * tex_coords.y - sina * tex_coords.x
-    ) + pivot;
-}
-
 uniform Light u_light;
 uniform vec3 u_viewPosition;
+uniform vec3 u_objectPosition;
 
 in vec3 v_position;
 in vec2 v_texCoords;
@@ -61,18 +50,13 @@ void main()
     {
         color *= texture2D( u_texture, v_texCoords );
     }
-    if (u_useAtmosphere)
-    {
-        // todo: Add cloud movements
-        color += vec4(texture2D(u_atmosphereTexture, v_texCoords).rgb, 0.4);
-    }
     vec3 bump_normal = v_normal;
     if (u_useBumpTexture) 
     {
         bump_normal += u_bumpStrength * vec3(texture2D(u_bumpTexture, v_texCoords));
     }
-    // Calculate total effect of lights on color
-    vec3 L = normalize(u_light.direction);
+    // calculate total effect of lights on color
+    vec3 L = normalize(u_light.position - u_objectPosition);
     vec3 N = normalize(bump_normal);
     vec3 V = normalize(u_viewPosition - v_position);
     vec3 R = reflect(L, N);
@@ -81,11 +65,17 @@ void main()
     vec3 ambient = u_light.ambient;
     
     // diffuse
-    float diffuse = max( dot(N, -L), 0.0 );
+    float diffuse = max( dot(N, L), 0.0 );
 
     // specular (TODO)
 
     vec3 light = u_light.color * (ambient + diffuse);
+
+    if (u_useAtmosphere)
+    {
+        // todo: Add cloud movements
+        color += vec4(texture2D(u_atmosphereTexture, v_texCoords).rgb, 0.4);
+    }
 
     color *= vec4(light, 1); 
     

@@ -100,7 +100,7 @@ class Object3D(object):
 
     def lookAtObject(self, target: object, local_coord: bool=True) -> None:
         if local_coord:
-            self.lookAt(target.getPosition())
+            self.setDirection()
         else:
             self.lookAt(target.getWorldPosition())
 

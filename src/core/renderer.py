@@ -66,12 +66,15 @@ class Renderer:
             mesh._Material._Uniforms["u_model"]._Data = mesh.getWorldMatrix()
             mesh._Material._Uniforms["u_view"]._Data = camera._ViewMatrix
             mesh._Material._Uniforms["u_proj"]._Data = camera._ProjectionMatrix
-            # If material uses light data, add lights from list
+            # if material uses light data, add lights from list
             if "u_light" in mesh._Material._Uniforms.keys():
                 mesh._Material._Uniforms["u_light"]._Data = light_list[0]
-            # Add camera position if needed (specular lighting)
+            # add camera position if needed (specular lighting)
             if "u_viewPosition" in mesh._Material._Uniforms.keys():
                 mesh._Material._Uniforms["u_viewPosition"]._Data = camera.getWorldPosition()
+            # add center of object position for light direction calculation
+            if "u_objectPosition" in mesh._Material._Uniforms.keys():
+                mesh._Material._Uniforms["u_objectPosition"]._Data = mesh.getWorldPosition()
             # Update uniforms stored in material
             for uniform_object in mesh._Material._Uniforms.values():
                 uniform_object.uploadData()

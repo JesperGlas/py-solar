@@ -15,7 +15,6 @@ class SunMaterial(Material):
 
         texture = Texture(FileUtils.getAsset("sun.jpg"))
         noise = Texture(FileUtils.getAsset("swirl.jpg"))
-        cloud = Texture(FileUtils.getAsset("plasma.jpg"))
 
         self.addUniform("vec3", "u_color", [1.0, 1.0, 1.0])
         self.addUniform("sampler2D", "u_texture", [texture._TextureRef, 1])

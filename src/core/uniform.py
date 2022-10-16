@@ -18,7 +18,6 @@ class Uniform(object):
             self._VariableRef = {
                 "ambient":      glGetUniformLocation(program_ref, f"{variable_name}.ambient"),
                 "color":        glGetUniformLocation(program_ref, f"{variable_name}.color"),
-                "direction":    glGetUniformLocation(program_ref, f"{variable_name}.direction"),
                 "position":     glGetUniformLocation(program_ref, f"{variable_name}.position"),
             }
         else:
@@ -54,5 +53,4 @@ class Uniform(object):
                 self._Data: Light
                 glUniform3f(self._VariableRef["ambient"],       *self._Data._Ambient)
                 glUniform3f(self._VariableRef["color"],         *self._Data._Color)
-                glUniform3f(self._VariableRef["direction"],     *self._Data.getDirection())
                 glUniform3f(self._VariableRef["position"],      *self._Data.getPosition())
