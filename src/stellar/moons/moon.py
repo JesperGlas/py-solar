@@ -4,20 +4,19 @@ from material.orbital_material import OrbitalMaterial
 from core.mesh import Mesh
 from light.occluder import Occluder
 
-class Earth(Mesh):
+class Moon(Mesh):
 
     def __init__(self, custom_radius=None) -> None:
 
-        earth_radius = SU.getEarthRadius()
+        moon_radius = SU.getEarthRadius()
         if custom_radius != None:
-            earth_radius = custom_radius
-        geo = SphereGeometry(radius=earth_radius, radius_segments=128, height_segments=64)
+            moon_radius = custom_radius
+        geo = SphereGeometry(radius=moon_radius, radius_segments=128, height_segments=64)
         mat = OrbitalMaterial(
-            texture_name="earth.jpg",
-            bumpmap_name="earth_bump.jpg",
-            atmosphere_name="earth_clouds.jpg")
+            texture_name="moon.jpg",
+            bumpmap_name="moon_bump.jpg" )
         super().__init__(geo, mat)
 
         # create and add occluder for shadow calculation
-        self._Occluder = Occluder(self.getWorldPosition(), earth_radius)
+        self._Occluder = Occluder(self.getWorldPosition(), moon_radius)
         self.add(self._Occluder)

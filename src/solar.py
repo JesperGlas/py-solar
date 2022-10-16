@@ -7,7 +7,6 @@ from core.openGLUtils import OpenGLUtils
 from core.fileUtils import FileUtils
 from core.base import Base
 from core.renderer import Renderer
-from core.render_target import RenderTarget
 
 # scene
 from core.scene import Scene
@@ -18,17 +17,14 @@ from core.mesh import Mesh
 from geometry.sphere_geometry import SphereGeometry
 
 # material
-from material.sun_material import SunMaterial
 from material.orbital_material import OrbitalMaterial
-
-# light
-from light.light import Light
 
 # extra
 from extras.movement_rig import MovementRig
 from stellar.stellar_utils import StellarUtils as SU
 from stellar.planets.earth import Earth
-
+from stellar.sun import Sun
+from stellar.moons.moon import Moon
 
 TITLE: str = "Solarpy"
 VERSION: str = "1.0.0"
@@ -51,10 +47,7 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=1280/720)
         self._Renderer = Renderer(clear_color=[0, 0, 0])
 
-
-        sun_geo = SphereGeometry(radius=2, radius_segments=128, height_segments=64)
-        sun_mat = SunMaterial()
-        self._Sun = Mesh(sun_geo, sun_mat)
+        self._Sun = Sun(custom_radius=1)
         self._MainScene.add(self._Sun)
         self._Sun.setPosition([0, 0, 0])
 
@@ -62,12 +55,7 @@ class App(Base):
         self._Sun.add(self._Earth)
         self._Earth.setPosition([10, 0, 0])
 
-        moon_geo = SphereGeometry(radius=0.5, radius_segments=64, height_segments=32)
-        moon_mat = OrbitalMaterial(
-            texture_name="moon.jpg",
-            use_shadows=True
-        )
-        self._Moon = Mesh(moon_geo, moon_mat)
+        self._Moon = Moon(custom_radius=0.5)
         self._Earth.add(self._Moon)
         self._Moon.setPosition([2, 0, 0])
 
@@ -77,11 +65,6 @@ class App(Base):
         self._CameraRig.setDirection([0, 0, -1])
         self._CameraRig.setPosition([0, 0, 10])
         self._Earth.add(self._CameraRig)
-
-        # setup light
-        self._Light = Light()
-        self._Light.setPosition([0, 0, 0])
-        self._MainScene.add(self._Light)
 
         # scene info
         print(f"Scene info:")
@@ -101,16 +84,16 @@ class App(Base):
             self._MainScene.printNodeTree()
 
         # update sun
-        #self._Sun.rotateY(0.001)
+        self._Sun.rotateY(0.001)
 
         # update earth
-        earth_rotation_speed = 0.001
+        earth_rotation_speed = 0.005
         self._Earth.rotateY(earth_rotation_speed)
 
         # update moon
-        moon_rotation_speed = 0.001
-        #self._Moon.rotateY(moon_rotation_speed)
-        #self._Moon.rotateY(moon_rotation_speed, False)
+        moon_rotation_speed = 0.005
+        self._Moon.rotateY(moon_rotation_speed)
+        self._Moon.rotateY(moon_rotation_speed, False)
 
         # update uniforms
         self._Sun._Material.setProperties(properties={

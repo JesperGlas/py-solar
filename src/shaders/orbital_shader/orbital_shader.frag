@@ -3,12 +3,22 @@ struct Light
     vec3 ambient;
     vec3 color;
     vec3 position;
+    float radius;
 };
 
-float softShadow(vec3 light_pos, float light_radius, vec3 occluder_pos, float occluder_radius, vec3 fragment)
+struct Occluder
 {
-    vec3 v0 = light_pos - fragment;
-    vec3 v1 = occluder_pos - fragment;
+    vec3 position;
+    float radius;
+};
+
+uniform Occluder u_occluder0;
+uniform Occluder u_occluder1;
+
+float softShadow(vec3 light_pos, float light_radius, vec3 occluder_pos, float occluder_radius)
+{
+    vec3 v0 = light_pos - gl_FragCoord.xyz;
+    vec3 v1 = occluder_pos - gl_FragCoord.xyz;
 
     float r0 = length(v0);
     float r1 = length(v1);
@@ -16,7 +26,7 @@ float softShadow(vec3 light_pos, float light_radius, vec3 occluder_pos, float oc
     float a0 = light_radius/r0;
     float a1 = occluder_radius/r1;
 
-    float a = length( cross(v0, v1)/(r0*r1) );
+    float a = length(cross(v0, v1)) / (r0*r1);
     a = smoothstep(a0 - a1, a0 + a1, a);
     return 1 - (1-a) * pow(a1/a0, 2);
 }
@@ -40,6 +50,7 @@ uniform vec3 u_objectPosition;
 in vec3 v_position;
 in vec2 v_texCoords;
 in vec3 v_normal;
+in float v_radius;
 
 out vec4 fragColor;
 
@@ -76,6 +87,10 @@ void main()
         // todo: Add cloud movements
         color += vec4(texture2D(u_atmosphereTexture, v_texCoords).rgb, 0.4);
     }
+
+    // shadows
+    light *= softShadow(u_light.position, u_light.radius, u_occluder0.position, u_occluder0.radius);
+    light *= softShadow(u_light.position, u_light.radius, u_occluder1.position, u_occluder1.radius);
 
     color *= vec4(light, 1); 
     

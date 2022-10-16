@@ -30,6 +30,9 @@ class OrbitalMaterial(Material):
         self.addUniform("Light", "u_light", None)
         self.addUniform("vec3", "u_viewPosition", [0, 0, 0])
         self.addUniform("vec3", "u_objectPosition", [0, 0, 0])
+
+        for n in range(2):
+            self.addUniform("Occluder", f"u_occluder{n}", None)
         
         # add shadow uniforms
 

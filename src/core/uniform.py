@@ -1,5 +1,6 @@
 from OpenGL.GL import *
 from light.light import Light
+from light.occluder import Occluder
 
 class Uniform(object):
 
@@ -19,6 +20,12 @@ class Uniform(object):
                 "ambient":      glGetUniformLocation(program_ref, f"{variable_name}.ambient"),
                 "color":        glGetUniformLocation(program_ref, f"{variable_name}.color"),
                 "position":     glGetUniformLocation(program_ref, f"{variable_name}.position"),
+                "radius":       glGetUniformLocation(program_ref, f"{variable_name}.radius")
+            }
+        elif self._DataType == "Occluder":
+            self._VariableRef = {
+                "position":     glGetUniformLocation(program_ref, f"{variable_name}.position"),
+                "radius":       glGetUniformLocation(program_ref, f"{variable_name}.radius")
             }
         else:
             self._VariableRef = glGetUniformLocation(program_ref, variable_name)
@@ -54,3 +61,8 @@ class Uniform(object):
                 glUniform3f(self._VariableRef["ambient"],       *self._Data._Ambient)
                 glUniform3f(self._VariableRef["color"],         *self._Data._Color)
                 glUniform3f(self._VariableRef["position"],      *self._Data.getPosition())
+                glUniform1f(self._VariableRef["radius"],        self._Data._Radius)
+            elif self._DataType == "Occluder":
+                self._Data: Occluder
+                glUniform3f(self._VariableRef["position"],      *self._Data._Position)
+                glUniform1f(self._VariableRef["radius"],        self._Data._Radius)

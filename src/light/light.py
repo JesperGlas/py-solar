@@ -8,3 +8,4 @@ class Light(Object3D):
         self._Ambient =     [0.1, 0.1, 0.1]
         self._Color =       [1, 1, 1]
         self._Position =    [0, 0, 0]
+        self._Radius =      1
