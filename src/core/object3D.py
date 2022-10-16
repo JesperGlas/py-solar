@@ -1,3 +1,4 @@
+from turtle import position
 import numpy as np
 from typing import Dict, List
 from core.matrix import Matrix
@@ -20,7 +21,7 @@ class Object3D(object):
         self._Children.remove(child)
         child._Parent = None
 
-    def getRoot(self) -> object:
+    def getRootObject(self) -> object:
         current = self._Parent
         while current._Parent != None:
             current = current._Parent
@@ -87,22 +88,10 @@ class Object3D(object):
         self._Transform.itemset((1, 3), position[1])
         self._Transform.itemset((2, 3), position[2])
 
-    def getDirectionTowards(self, target_position):
-        return Matrix.makeLookAt(self.getWorldPosition(), target_position)
-
-    def getDirectionTowardsObject(self, target: object):
-        return self.getDirectionTowards(target.getWorldPosition())
-
     def lookAt(self, target_position):
         self._Transform = Matrix.makeLookAt(
             self.getWorldPosition(),
             target_position )
-
-    def lookAtObject(self, target: object, local_coord: bool=True) -> None:
-        if local_coord:
-            self.setDirection()
-        else:
-            self.lookAt(target.getWorldPosition())
 
     def getOrientationMatrix(self):
         return np.array([
@@ -114,8 +103,19 @@ class Object3D(object):
         forward = np.array( [0, 0, -1] )
         return list( self.getOrientationMatrix() @ forward )
 
+    def getDirection(self, target):
+        direction = np.array( self.getWorldPosition() ) - np.array( target.getWorldPosition() )
+        return (direction / np.linalg.norm( direction )).tolist()
+
     def setDirection(self, direction) -> None:
         position = self.getPosition()
+        self.__setDirection(position, direction)
+
+    def setWorldDirection(self, direction) -> None:
+        position = self.getWorldPosition()
+        self.__setDirection(position, direction)
+
+    def __setDirection(self, position, direction) -> None:
         target_position = [
             position[0] + direction[0],
             position[1] + direction[1],

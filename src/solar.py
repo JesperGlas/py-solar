@@ -22,6 +22,7 @@ from material.orbital_material import OrbitalMaterial
 # extra
 from extras.movement_rig import MovementRig
 from stellar.stellar_utils import StellarUtils as SU
+from stellar.stellar_body import StellarBody
 from stellar.planets.earth import Earth
 from stellar.sun import Sun
 from stellar.moons.moon import Moon
@@ -47,20 +48,20 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=1280/720)
         self._Renderer = Renderer(clear_color=[0, 0, 0])
 
-        self._Sun = Sun(custom_radius=1)
+        self._Sun = Sun()
         self._MainScene.add(self._Sun)
         self._Sun.setPosition([0, 0, 0])
 
-        self._Earth = Earth(custom_radius=1)
+        self._Earth = Earth()
         self._Sun.add(self._Earth)
-        self._Earth.setPosition([10, 0, 0])
+        self._Earth.setPosition()
 
-        self._Moon = Moon(custom_radius=0.5)
+        self._Moon = Moon()
         self._Earth.add(self._Moon)
-        self._Moon.setPosition([2, 0, 0])
+        self._Moon.setPosition()
 
         # setup moving camera position
-        self._CameraRig = MovementRig(units_per_sec=5)
+        self._CameraRig = MovementRig(units_per_sec=1)
         self._CameraRig.add(self._Camera)
         self._CameraRig.setDirection([0, 0, -1])
         self._CameraRig.setPosition([0, 0, 10])
@@ -74,26 +75,22 @@ class App(Base):
         # update data
         self._CameraRig.update(self._Input, self._DeltaTime)
         if self._Input.isKeyDown("1"):
-            self._CameraRig.attach(self._Sun, distance=8)
+            self._CameraRig.attach(self._Sun, self._Sun.getRadius()*3)
             self._MainScene.printNodeTree()
         if self._Input.isKeyDown("2"):
-            self._CameraRig.attach(self._Earth, 4)
+            self._CameraRig.attach(self._Earth, self._Earth.getRadius()*3)
             self._MainScene.printNodeTree()
         if self._Input.isKeyDown("3"):
-            self._CameraRig.attach(self._Moon, 2)
+            self._CameraRig.attach(self._Moon, self._Moon.getRadius()*3)
             self._MainScene.printNodeTree()
 
-        # update sun
-        self._Sun.rotateY(0.001)
-
-        # update earth
-        earth_rotation_speed = 0.005
-        self._Earth.rotateY(earth_rotation_speed)
-
-        # update moon
-        moon_rotation_speed = 0.005
-        self._Moon.rotateY(moon_rotation_speed)
-        self._Moon.rotateY(moon_rotation_speed, False)
+        # update stellar objects
+        stellar_list = list( filter(
+            lambda x: isinstance(x, StellarBody),
+            self._MainScene.getDescendantList()) )
+        stellar_body: StellarBody
+        for stellar_body in stellar_list:
+            stellar_body.update()
 
         # update uniforms
         self._Sun._Material.setProperties(properties={

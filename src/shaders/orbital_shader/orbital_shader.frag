@@ -31,6 +31,9 @@ float softShadow(vec3 light_pos, float light_radius, vec3 occluder_pos, float oc
     return 1 - (1-a) * pow(a1/a0, 2);
 }
 
+// atmos
+
+
 uniform vec3 u_color;
 uniform bool u_useTexture;
 uniform sampler2D u_texture;
@@ -43,9 +46,13 @@ uniform bool u_useAtmosphere;
 uniform sampler2D u_atmosphereTexture;
 uniform float u_time;
 
+uniform bool u_useNightTexture;
+uniform sampler2D u_nightTexture;
+
 uniform Light u_light;
 uniform vec3 u_viewPosition;
 uniform vec3 u_objectPosition;
+uniform mat4 u_view;
 
 in vec3 v_position;
 in vec2 v_texCoords;
@@ -92,7 +99,5 @@ void main()
     light *= softShadow(u_light.position, u_light.radius, u_occluder0.position, u_occluder0.radius);
     light *= softShadow(u_light.position, u_light.radius, u_occluder1.position, u_occluder1.radius);
 
-    color *= vec4(light, 1); 
-    
-    fragColor = color;
+    fragColor = color * vec4(light, 1);
 }

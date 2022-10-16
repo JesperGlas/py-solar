@@ -113,4 +113,4 @@ class Matrix(object):
             [right[1], up[1], -forward[1], position[1]],
             [right[2], up[2], -forward[2], position[2]],
             [0, 0, 0, 1]
-        ]).astype(float) # should astype be there?
+        ])
