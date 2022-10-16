@@ -5,7 +5,7 @@ class Light(Object3D):
     def __init__(self) -> None:
         super().__init__()
 
-        self._Ambient =     [0.1, 0.1, 0.1]
+        self._Ambient =     [0.1]*3
         self._Color =       [1, 1, 1]
         self._Position =    [0, 0, 0]
         self._Radius =      1

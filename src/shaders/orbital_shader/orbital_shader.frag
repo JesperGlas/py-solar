@@ -81,6 +81,13 @@ void main()
 
     // ambient
     vec3 ambient = u_light.ambient;
+
+    if (u_useNightTexture)
+    {
+        float dark = 1-max(dot(L, N), 0.0);
+        color = mix(color, texture2D( u_nightTexture, v_texCoords ), dark);
+        ambient += 0.2;
+    }
     
     // diffuse
     float diffuse = max( dot(N, L), 0.0 );
@@ -92,7 +99,7 @@ void main()
     if (u_useAtmosphere)
     {
         // todo: Add cloud movements
-        color += vec4(texture2D(u_atmosphereTexture, v_texCoords).rgb, 0.4);
+        color += vec4(texture2D(u_atmosphereTexture, v_texCoords).rgb, 0.5);
     }
 
     // shadows

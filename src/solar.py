@@ -17,7 +17,8 @@ from core.mesh import Mesh
 from geometry.sphere_geometry import SphereGeometry
 
 # material
-from material.orbital_material import OrbitalMaterial
+from core.texture import Texture
+from material.texture_material import TextureMaterial
 
 # extra
 from extras.movement_rig import MovementRig
@@ -48,24 +49,23 @@ class App(Base):
         self._Camera = Camera(aspect_ratio=1280/720)
         self._Renderer = Renderer(clear_color=[0, 0, 0])
 
-        self._Sun = Sun()
+        self._Sun = Sun(custom_radius=10)
         self._MainScene.add(self._Sun)
         self._Sun.setPosition([0, 0, 0])
 
-        self._Earth = Earth()
+        self._Earth = Earth(custom_radius=2)
         self._Sun.add(self._Earth)
-        self._Earth.setPosition()
+        self._Earth.setPosition([100, 0, 0])
 
-        self._Moon = Moon()
+        self._Moon = Moon(custom_radius=1)
         self._Earth.add(self._Moon)
-        self._Moon.setPosition()
+        self._Moon.setPosition([10, 0, 0])
 
         # setup moving camera position
         self._CameraRig = MovementRig(units_per_sec=1)
         self._CameraRig.add(self._Camera)
-        self._CameraRig.setDirection([0, 0, -1])
-        self._CameraRig.setPosition([0, 0, 10])
-        self._Earth.add(self._CameraRig)
+        self._Camera.setDirection([0, 0, -1])
+        self._CameraRig.attach(self._Earth, self._Earth.getRadius()*3)
 
         # scene info
         print(f"Scene info:")
@@ -76,12 +76,15 @@ class App(Base):
         self._CameraRig.update(self._Input, self._DeltaTime)
         if self._Input.isKeyDown("1"):
             self._CameraRig.attach(self._Sun, self._Sun.getRadius()*3)
+            self._CameraRig._UnitsPerSecond = self._Sun.getRadius()
             self._MainScene.printNodeTree()
         if self._Input.isKeyDown("2"):
             self._CameraRig.attach(self._Earth, self._Earth.getRadius()*3)
+            self._CameraRig._UnitsPerSecond = self._Earth.getRadius()
             self._MainScene.printNodeTree()
         if self._Input.isKeyDown("3"):
             self._CameraRig.attach(self._Moon, self._Moon.getRadius()*3)
+            self._CameraRig._UnitsPerSecond = self._Moon.getRadius()
             self._MainScene.printNodeTree()
 
         # update stellar objects
