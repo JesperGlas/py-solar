@@ -8,10 +8,11 @@ from core.texture import Texture
 class OrbitalMaterial(Material):
 
     def __init__(self,
-        color_tex_name: str=None,
-        bump_tex_name: str=None,
-        atmosphere_tex_name: str=None,
-        night_tex_name: str=None,
+        color_tex: str=None,
+        night_tex: str=None,
+        bump_tex: str=None,
+        specular_tex: str=None,
+        atmosphere_tex: str=None,
         custom_shader: str = None,
         use_shadows: bool=False,
         properties: Dict={}) -> None:
@@ -36,36 +37,43 @@ class OrbitalMaterial(Material):
 
         # add texture uniforms
         self.addUniform("bool", "u_useTexture", 0)
-        if color_tex_name == None:
+        if color_tex == None:
             self.addUniform("bool", "u_useTexture", False)
         else:
-            color_texture = Texture(FileUtils.getAsset(color_tex_name))
+            color_texture = Texture(FileUtils.getAsset(color_tex))
             self.addUniform("bool", "u_useTexture", True)
             self.addUniform("sampler2D", "u_texture", [color_texture._TextureRef, 1])
 
         # add bumpmap uniforms
-        if bump_tex_name == None:
+        if bump_tex == None:
             self.addUniform("bool", "u_useBumpTexture", False)
         else:
-            bump_texture = Texture(FileUtils.getAsset(bump_tex_name))
+            bump_texture = Texture(FileUtils.getAsset(bump_tex))
             self.addUniform("bool", "u_useBumpTexture", True)
             self.addUniform("sampler2D", "u_bumpTexture", [bump_texture._TextureRef, 2])
             self.addUniform("float", "u_bumpStrength", 1.0)
 
         # atmospheric effect
-        if atmosphere_tex_name == None:
+        if atmosphere_tex == None:
             self.addUniform("bool", "u_useAtmosphere", False)
         else:
-            atmosphere_texture = Texture(FileUtils.getAsset(atmosphere_tex_name))
+            atmosphere_texture = Texture(FileUtils.getAsset(atmosphere_tex))
             self.addUniform("bool", "u_useAtmosphere", True)
             self.addUniform("sampler2D", "u_atmosphereTexture", [atmosphere_texture._TextureRef, 3])
 
-        if night_tex_name == None:
+        if night_tex == None:
             self.addUniform("bool", "u_useNightTexture", False)
         else:
-            night_texture = Texture(FileUtils.getAsset(night_tex_name))
+            night_texture = Texture(FileUtils.getAsset(night_tex))
             self.addUniform("bool", "u_useNightTexture", True)
             self.addUniform("sampler2D", "u_nightTexture", [night_texture._TextureRef, 4])
+
+        if specular_tex == None:
+            self.addUniform("bool", "u_useSpecularTexture", False)
+        else:
+            specular_texture = Texture(FileUtils.getAsset(specular_tex))
+            self.addUniform("bool", "u_useSpecularTexture", True)
+            self.addUniform("sampler2D", "u_specularTexture", [specular_texture._TextureRef, 5])
 
         self.locateUniforms()
 

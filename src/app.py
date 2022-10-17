@@ -26,7 +26,7 @@ AUTHOR: str = "Jesper Glas"
 
 class App(Base):
 
-    def __init__(self, screen_size=[1280, 720], caption="App Window"):
+    def __init__(self, screen_size=[1920, 1080], caption="App Window"):
         super().__init__(screen_size, caption)
 
         # print system information
@@ -54,6 +54,8 @@ class App(Base):
         
     def update(self) -> None:
         # input
+        if self._Input.isKeyPressed("escape"):
+            self._Running = False
         if self._Input.isKeyUp("1"):
             # stop current active scene
             self._ActiveScene.stop()

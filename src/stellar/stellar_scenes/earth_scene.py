@@ -7,7 +7,7 @@ from core.input import Input
 from geometry.sphere_geometry import SphereGeometry
 
 # material
-from material.orbital_material import OrbitalMaterial
+from stellar.orbital_material import OrbitalMaterial
 
 # stellar imports
 from stellar.stellar_scene import StellarScene
@@ -25,24 +25,26 @@ class EarthScene(StellarScene):
         # set up target
         geometry = SphereGeometry(radius_segments=128, height_segments=64)
         material = OrbitalMaterial(
-            color_tex_name="earth.jpg",
-            night_tex_name="earth_night.jpg",
-            bump_tex_name="earth_bump.jpg",
-            atmosphere_tex_name="earth_atmosphere.jpg" )
+            color_tex="earth.jpg",
+            night_tex="earth_night.jpg",
+            bump_tex="earth_bump.jpg",
+            specular_tex="earth_specular.png",
+            atmosphere_tex="earth_atmosphere.jpg" )
         self._Target = Mesh(geometry, material)
 
         # set up moons
         geometry = SphereGeometry(radius=0.27264, radius_segments=128, height_segments=64)
         material = OrbitalMaterial(
-            color_tex_name="moon.jpg",
-            bump_tex_name="moon_bump.jpg" )
+            color_tex="moon.jpg",
+            bump_tex="moon_bump.jpg" )
         self._Moon = Mesh(geometry, material)
         self._Target.add(self._Moon)
-        self._Moon.setPosition([3, 0, 0])
+        moon_distance = 1/6371 * 384400
+        self._Moon.setPosition([moon_distance, 0, 0])
 
         # set up light
         self._Light = Light()
-        self._Light.setPosition([-10, 0, 0])
+        self._Light.setPosition([-1e6, 0, 0])
         self._Target.add(self._Light)
         return super().initialize()
 
