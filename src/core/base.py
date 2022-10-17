@@ -16,6 +16,9 @@ class Base(object):
             pg.GL_CONTEXT_PROFILE_CORE )
         self._Screen = pg.display.set_mode(screen_size, display_flags)
         pg.display.set_caption(caption)
+
+        # save screen resolution for child classes
+        self._Resolution = screen_size
         
         self._Running = True
         self._Clock = pg.time.Clock()
