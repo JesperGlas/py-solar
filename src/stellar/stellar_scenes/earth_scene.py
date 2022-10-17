@@ -8,6 +8,7 @@ from geometry.sphere_geometry import SphereGeometry
 
 # material
 from stellar.orbital_material import OrbitalMaterial
+from stellar.atmosphere_material import AtmosphereMaterial
 
 # stellar imports
 from stellar.stellar_scene import StellarScene
@@ -31,6 +32,13 @@ class EarthScene(StellarScene):
             specular_tex="earth_specular.png",
             atmosphere_tex="earth_atmosphere.jpg" )
         self._Target = Mesh(geometry, material)
+
+        # set up atmosphere
+        geometry = SphereGeometry(1.02, radius_segments=128, height_segments=64)
+        material = AtmosphereMaterial()
+        atmosphere = Mesh(geometry, material)
+        atmosphere.setPosition([0, 0, 0])
+        self._Target.add(atmosphere)
 
         # set up moons
         geometry = SphereGeometry(radius=0.27264, radius_segments=128, height_segments=64)

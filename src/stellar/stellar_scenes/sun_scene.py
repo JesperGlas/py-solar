@@ -8,6 +8,7 @@ from geometry.sphere_geometry import SphereGeometry
 
 # material
 from material.sun_material import SunMaterial
+from stellar.atmosphere_material import AtmosphereMaterial
 
 # stellar imports
 from stellar.stellar_scene import StellarScene
@@ -22,6 +23,7 @@ class SunScene(StellarScene):
         material = SunMaterial()
         self._Target = Mesh(geometry, material)
         self.add(self._Target)
+        
         return super().initialize()
 
     def update(self, input: Input, delta_time: float, elapsed_time: float) -> None:
