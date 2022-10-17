@@ -99,7 +99,7 @@ void main()
     if (u_useAtmosphere)
     {
         // todo: Add cloud movements
-        color += vec4(texture2D(u_atmosphereTexture, v_texCoords).rgb, 0.5);
+        color += vec4(texture2D(u_atmosphereTexture, v_texCoords).rgb, 0.4);
     }
 
     // shadows

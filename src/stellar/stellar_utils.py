@@ -2,7 +2,7 @@
 class StellarUtils(object):
 
     KM_RADIUS = 5.90911589e9
-    UNIT_RADIUS = 1e4
+    UNIT_RADIUS = 1e6
 
     EARTH_TO_SUN = 1.4917e8
     MOON_TO_EARTH = 3.844e5
@@ -24,12 +24,20 @@ class StellarUtils(object):
         return cls.km2Unit(6.37e3)
 
     @classmethod
-    def getEarthSunDistance(cls) -> float:
-        return cls.km2Unit(cls.EARTH_TO_SUN)
+    def getVenusRadius(cls) -> float:
+        return cls.km2Unit(6.0518e3)
 
     @classmethod
     def getMoonRadius(cls) -> float:
         return cls.km2Unit(1.73e3)
+
+    @classmethod
+    def getEarthSunDistance(cls) -> float:
+        return cls.km2Unit(cls.EARTH_TO_SUN)
+
+    @classmethod
+    def getVenusSunDistance(cls) -> float:
+        return cls.km2Unit(1.08e8)
     
     @classmethod
     def getMoonEarthDistance(cls) -> float:
