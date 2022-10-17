@@ -34,9 +34,6 @@ class MovementRig(Object3D):
      def remove(self, child: Object3D) -> None:
           self._LookAttachment.remove(child)
 
-     def setMoveSpeed(self, units_per_second: float) -> None:
-          self._UnitsPerSecond = units_per_second
-
      def update(self, input_object: Input, delta_time) -> None:
           move_amount     = self._UnitsPerSecond * delta_time
           rotate_amount   = self._DegreesPerSecond * (pi / 180) * delta_time
@@ -65,13 +62,3 @@ class MovementRig(Object3D):
                self._LookAttachment.rotateX( rotate_amount ) 
           if input_object.isKeyPressed(self.KEY_LOOK_DOWN):
                self._LookAttachment.rotateX( -rotate_amount )
-
-     def detach(self) -> None:
-          if self._Parent:
-               self._Parent.remove(self)
-
-     def attach(self, target: Object3D, distance=1) -> None:
-          if self._Parent:
-               self.detach()
-          target.add(self)
-          self.setPosition([0, 0, distance])

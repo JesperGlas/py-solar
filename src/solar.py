@@ -11,17 +11,13 @@ from core.renderer import Renderer
 # scene
 from core.scene import Scene
 from core.camera import Camera
-from core.mesh import Mesh
 
 # geometry
-from geometry.sphere_geometry import SphereGeometry
 
 # material
-from core.texture import Texture
-from material.texture_material import TextureMaterial
 
 # extra
-from extras.movement_rig import MovementRig
+from stellar.stellar_camera import StellarCamera
 from stellar.stellar_utils import StellarUtils as SU
 from stellar.stellar_body import StellarBody
 from stellar.planets.earth import Earth
@@ -47,7 +43,6 @@ class App(Base):
 
     def initialize(self) -> None:
         self._MainScene = Scene()
-        self._Camera = Camera(aspect_ratio=1280/720, far=SU.UNIT_RADIUS)
         self._Renderer = Renderer(clear_color=[0, 0, 0])
 
         self._Sun = Sun()
@@ -67,9 +62,7 @@ class App(Base):
         self._Moon.setPosition()
 
         # setup moving camera position
-        self._CameraRig = MovementRig(units_per_sec=1)
-        self._CameraRig.add(self._Camera)
-        self._Camera.setDirection([0, 0, -1])
+        self._CameraRig = StellarCamera(view_distance=1000)
         self._CameraRig.attach(self._Earth, self._Earth.getRadius()*3)
 
         # scene info
@@ -112,6 +105,6 @@ class App(Base):
             "u_time": self._ElapsedTime })
 
         # render
-        self._Renderer.render(self._MainScene, self._Camera)
+        self._Renderer.render(self._MainScene, self._CameraRig._Camera)
     
 App().run()
