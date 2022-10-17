@@ -5,7 +5,6 @@ from core.mesh import Mesh
 from core.scene import Scene
 from core.camera import Camera
 from light.light import Light
-from light.occluder import Occluder
 
 
 class Renderer:
@@ -52,10 +51,6 @@ class Renderer:
         # Extract list of all Mesh instances in scene
         descendant_list = scene.getDescendantList()
         mesh_list = list(filter(lambda x: isinstance(x, Mesh), descendant_list))
-        # Extract list of all Light instances in scene
-        light_list = list(filter(lambda x: isinstance(x, Light), descendant_list))
-        # create occluders for each orbital object
-        occluder_list = list(filter(lambda x: isinstance(x, Occluder), descendant_list))
         mesh: Mesh
         for mesh in mesh_list:
             # If this object is not visible, continue to next object in list
@@ -69,14 +64,12 @@ class Renderer:
             mesh._Material._Uniforms["u_view"]._Data = camera._ViewMatrix
             mesh._Material._Uniforms["u_proj"]._Data = camera._ProjectionMatrix
             # if material uses light data, add lights from list
+            light_list = list( filter(lambda x: isinstance(x, Light), descendant_list) )
+            # add empty light if no one is found
+            if len(light_list) == 0:
+                light_list.append(Light())
             if "u_light" in mesh._Material._Uniforms.keys():
                 mesh._Material._Uniforms["u_light"]._Data = light_list[0]
-            # update occluder positions from parent objects
-            if "u_occluder0" in mesh._Material._Uniforms.keys():
-                for n, occluder in enumerate(occluder_list):
-                    occluder: Occluder
-                    occluder._Position = occluder._Parent.getWorldPosition()
-                    mesh._Material._Uniforms[f"u_occluder{n}"]._Data = occluder
             # add camera position if needed (specular lighting)
             if "u_viewPosition" in mesh._Material._Uniforms.keys():
                 mesh._Material._Uniforms["u_viewPosition"]._Data = camera.getWorldPosition()

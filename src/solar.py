@@ -9,7 +9,10 @@ from core.renderer import Renderer
 
 # scene
 from stellar.stellar_scene import StellarScene
+
+# predefined scenes
 from stellar.stellar_scenes.sun_scene import SunScene
+from stellar.stellar_scenes.earth_scene import EarthScene
 
 # geometry
 
@@ -34,14 +37,35 @@ class App(Base):
     def initialize(self) -> None:
         self._Renderer = Renderer(clear_color=[0, 0, 0])
 
-        self._ActiveScene = SunScene()
-        self._SceneList: List[StellarScene] = [self._ActiveScene]
+        # init scene list for additional scenes
+        self._SceneList: List[StellarScene] = []
+
+        # add aditional scenes
+        self._SceneList.append(SunScene())
+        self._SceneList.append(EarthScene())
+
+        # set an active scene
+        self._ActiveScene = self._SceneList[1]
+        self._ActiveScene.play()
 
         # scene info
         print(f"Scene info:")
         self._ActiveScene.printNodeTree()
         
     def update(self) -> None:
+        # input
+        if self._Input.isKeyUp("1"):
+            # stop current active scene
+            self._ActiveScene.stop()
+            # set new active scene
+            self._ActiveScene = self._SceneList[0]
+            # play new active scene
+            self._ActiveScene.play()
+        if self._Input.isKeyUp("2"):
+            self._ActiveScene.stop()
+            self._ActiveScene = self._SceneList[1]
+            self._ActiveScene.play()
+        
         # update data
         self._ActiveScene.update(self._Input, self._DeltaTime, self._ElapsedTime)
 

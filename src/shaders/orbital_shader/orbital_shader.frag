@@ -6,59 +6,37 @@ struct Light
     float radius;
 };
 
-struct Occluder
-{
-    vec3 position;
-    float radius;
-};
+// light uniforms
+uniform Light u_light;
+uniform vec3 u_viewPosition;
+uniform vec3 u_objectPosition;
 
-uniform Occluder u_occluder0;
-uniform Occluder u_occluder1;
-
-float softShadow(vec3 light_pos, float light_radius, vec3 occluder_pos, float occluder_radius)
-{
-    vec3 v0 = light_pos - gl_FragCoord.xyz;
-    vec3 v1 = occluder_pos - gl_FragCoord.xyz;
-
-    float r0 = length(v0);
-    float r1 = length(v1);
-
-    float a0 = light_radius/r0;
-    float a1 = occluder_radius/r1;
-
-    float a = length(cross(v0, v1)) / (r0*r1);
-    a = smoothstep(a0 - a1, a0 + a1, a);
-    return 1 - (1-a) * pow(a1/a0, 2);
-}
-
-// atmos
-
-
+// color uniforms
 uniform vec3 u_color;
 uniform bool u_useTexture;
 uniform sampler2D u_texture;
 
+// height uniforms
 uniform bool u_useBumpTexture;
 uniform sampler2D u_bumpTexture;
 uniform float u_bumpStrength;
 
+// atmosphere uniforms
 uniform bool u_useAtmosphere;
 uniform sampler2D u_atmosphereTexture;
 uniform float u_time;
 
+// night uniforms
 uniform bool u_useNightTexture;
 uniform sampler2D u_nightTexture;
 
-uniform Light u_light;
-uniform vec3 u_viewPosition;
-uniform vec3 u_objectPosition;
-uniform mat4 u_view;
-
+// vertex shader data
 in vec3 v_position;
 in vec2 v_texCoords;
 in vec3 v_normal;
 in float v_radius;
 
+// out data
 out vec4 fragColor;
 
 void main()
@@ -101,10 +79,6 @@ void main()
         // todo: Add cloud movements
         color += vec4(texture2D(u_atmosphereTexture, v_texCoords).rgb, 0.4);
     }
-
-    // shadows
-    light *= softShadow(u_light.position, u_light.radius, u_occluder0.position, u_occluder0.radius);
-    light *= softShadow(u_light.position, u_light.radius, u_occluder1.position, u_occluder1.radius);
 
     fragColor = color * vec4(light, 1);
 }
