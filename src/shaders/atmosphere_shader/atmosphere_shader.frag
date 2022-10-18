@@ -29,26 +29,6 @@ out vec4 fragColor;
 
 void main()
 {
-    // calculate total effect of lights on color
-    vec3 L = normalize(u_light.position - u_objectPosition);
-    vec3 N = normalize(v_normal);
-    vec3 V = normalize(u_viewPosition - v_position);
-    vec3 R = reflect(-L, N);
-
-    // ambient
-    vec3 ambient = u_light.ambient;
-    
-    // diffuse
-    float diffuse = max( dot(N, L), 0.0 );
-
-    // specular (TODO)
-    float specular = 0.0;
-
-    float specular_strength = 0.5;
-    specular = pow( max( dot(V, R), 0.0 ), 32 ) * specular_strength;
-
-    vec3 light = u_light.color * (ambient + diffuse + specular);
-
     // calculate color
     fragColor = u_color;
 }

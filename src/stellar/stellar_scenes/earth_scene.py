@@ -38,7 +38,7 @@ class EarthScene(StellarScene):
         material = AtmosphereMaterial()
         atmosphere = Mesh(geometry, material)
         atmosphere.setPosition([0, 0, 0])
-        self._Target.add(atmosphere)
+        #self._Target.add(atmosphere)
 
         # set up moons
         geometry = SphereGeometry(radius=0.27264, radius_segments=128, height_segments=64)

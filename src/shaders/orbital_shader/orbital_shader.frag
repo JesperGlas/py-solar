@@ -80,13 +80,6 @@ void main()
     {
         color *= texture2D( u_texture, v_texCoords );
     }
-
-    if (u_useAtmosphere)
-    {
-        // todo: Add cloud movements
-        color += vec4(texture2D(u_atmosphereTexture, v_texCoords).rgb, 0.4);
-    }
-
     if (u_useNightTexture)
     {
         float dark = 1-max(dot(L, N), 0.0);
@@ -95,6 +88,11 @@ void main()
         // increase ambient to compensate for dark night texture
         vec3 ambient_increase = vec3(0.2);
         light += ambient_increase;
+    }
+    if (u_useAtmosphere)
+    {
+        // todo: Add cloud movements
+        color += vec4(texture2D(u_atmosphereTexture, v_texCoords).rgb, 0.4);
     }
 
     fragColor = color * vec4(light, 1);
