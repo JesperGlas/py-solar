@@ -30,7 +30,7 @@ class App(Base):
         super().__init__(screen_size, caption)
 
         # print system information
-        print(f"\nSystem information:")
+        print("\nSystem information:")
         OpenGLUtils.printSystemInfo()
         FileUtils.setProjectRoot()
 
@@ -49,9 +49,9 @@ class App(Base):
         self._ActiveScene.play()
 
         # scene info
-        print(f"Scene info:")
+        print("Scene info:")
         self._ActiveScene.printNodeTree()
-        
+
     def update(self) -> None:
         # input
         if self._Input.isKeyPressed("escape"):
@@ -67,11 +67,12 @@ class App(Base):
             self._ActiveScene.stop()
             self._ActiveScene = self._SceneList[1]
             self._ActiveScene.play()
-        
+
         # update data
         self._ActiveScene.update(self._Input, self._DeltaTime, self._ElapsedTime)
 
         # render
         self._Renderer.render(self._ActiveScene, self._ActiveScene._Camera)
-    
+
+
 App().run()
